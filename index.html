@@ -482,11 +482,9 @@
     .toast.toast-hide { opacity: 0; }
 
 
-    /* =============================================
-       スマホ対応（画面幅480px以下）
-       ============================================= */
-
-    @media (max-width: 480px) {
+    /* max-height: 500px → 高さが500px以下のときだけ禁止 */
+    /* スマホ横向き（375px前後）は禁止、iPad mini4横向き（768px）は許可 */
+    @media (orientation: landscape) and (max-height: 500px) {
       .container { padding: 140px 10px 90px; }
       .todo-card { padding: 8px 10px; margin-bottom: 6px; border-radius: 8px; }
       .todo-main-text { font-size: 14px; }
@@ -540,8 +538,9 @@
   <!-- 横向きのときに表示するメッセージ（#appの外に置く） -->
   <div class="rotate-message">
     <div class="rotate-icon">📱</div>
-    <div>縦向きでご利用ください</div>
-    <div style="font-size:13px; color:#aaa;">Please use in portrait mode</div>
+  <!-- 日本語と英語を両方ベタ書きする -->
+  <div>縦向きでご利用ください</div>
+  <div style="font-size:13px; color:#aaa;">Please use in portrait mode</div>
   </div>
 
 <div id="app" class="container">
