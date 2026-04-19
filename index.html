@@ -899,8 +899,8 @@ const app = createApp({
                                       }
       },
 
-      // 上部固定エリアの高さ（最初は140pxと仮定）
-      topHeight: 140, 
+      // 上部固定エリアの高さ
+      topHeight: 120, 
 
       // 追加フォームの入力値
       newTodo:   '',
@@ -1613,13 +1613,12 @@ const app = createApp({
     this.$nextTick(() => {
       this.openGroups = this.groupedTodos.map(g => g.label)
       this.updateTopHeight()
-    
+    }) 
     
     // 画面サイズが変わったとき（向き変更など）も高さを測り直す
-    window.addEventListener('resize', () => {
-      this.updateTopHeight() 
-       
-    })   
+      window.addEventListener('resize', () => {
+      this.updateTopHeight()
+    })
   }
 
 }) // createApp ここまで
