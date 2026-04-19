@@ -1102,12 +1102,14 @@ const app = createApp({
 
     // タスクを削除する
     deleteTodo(todo) {
-      // ファイル選択前にフォーマット説明を表示
-      // confirm → OK なら選択に進む、キャンセルなら中止
       const DELETEproceed = confirm(this.t.deleteInfo)
       if (!DELETEproceed) return
 
-      this.cancelEditIfNeeded()
+      // cancelEditIfNeeded()は「元に戻す」処理も走るので削除時には使わない
+      // バックアップをそっと捨てるだけにする
+      this.editingId = null
+      this.editingBackup = null
+
       // トーストを先に表示（削除後だとtodo.textが取れないため）
       this.showToast(this.t.toastDeleted, todo.text)
       this.todos = this.todos.filter(t => t.id !== todo.id)
