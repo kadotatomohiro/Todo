@@ -1171,6 +1171,10 @@ const app = createApp({
       this.category  = todo.category
       this.dueDate   = ''
       this.showInput = true
+
+      // コピー後に追加フォームが見えるよう、画面を一番上にスクロールする
+      // behavior: 'smooth' → ふわっと滑らかに動く（'auto'にすると瞬間移動）
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     },
 
 
