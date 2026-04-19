@@ -34,12 +34,12 @@
     * { box-sizing: border-box; }
     body { background: #f0f0f0; margin: 0; }
 
-    /* padding-top → 上部固定エリアの高さ分だけ下げる */
-    /* padding-bottom → 下部固定ボタンの裏に隠れないように */
+    /* padding-top はVueで動的に変えるのでCSSからは消す */
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 140px 16px 90px;
+      /* padding-top: 140px; ← この行を消す！ */
+      padding: 0 16px 90px;  /* 上の余白だけ消す */
       font-family: sans-serif;
     }
 
@@ -504,7 +504,8 @@
 </head>
 <body>
 
-<div id="app" class="container">
+  <!-- :style で padding-top を動的に変える -->
+  <div id="app" class="container" :style="{ paddingTop: topHeight + 'px' }">
 
   <!-- ══ 上部固定エリア ══ -->
   <div class="top-fixed">
@@ -878,6 +879,9 @@ const app = createApp({
                                       }
       },
 
+      // 上部固定エリアの高さ（最初は140pxと仮定）
+      topHeight: 140, 
+
       // 追加フォームの入力値
       newTodo:   '',
       category:  '',
@@ -1046,6 +1050,15 @@ const app = createApp({
 
   // ── メソッド（ボタンを押したときなどの処理） ──
   methods: {
+
+    // 上部固定エリアの高さを測って topHeight を更新する
+    updateTopHeight() {
+      const topEl = document.querySelector('.top-fixed')
+      if (topEl) {
+        // getBoundingClientRect().height → 要素の実際の高さを取得する
+        this.topHeight = topEl.getBoundingClientRect().height
+      }
+    }, 
   
   // ── フォーム関連 ──
 
@@ -1536,7 +1549,14 @@ const app = createApp({
         // 全グループを開いた状態にする
         this.openGroups = this.groupedTodos.map(g => g.label)
       }
-    }
+    },
+
+    // フォームの開閉で上部の高さが変わるので測り直す
+    showInput() {
+      this.$nextTick(() => {
+        this.updateTopHeight()
+      })
+    },
   },
 
 
@@ -1552,7 +1572,6 @@ const app = createApp({
     history.scrollRestoration = 'manual'
   }
 
-
     const saved = localStorage.getItem('todos')
     try {
       if (saved) this.todos = JSON.parse(saved)
@@ -1565,6 +1584,11 @@ const app = createApp({
     // $nextTick → Vueが画面を更新し終わったあとに実行する
     this.$nextTick(() => {
       this.openGroups = this.groupedTodos.map(g => g.label)
+    })
+
+    // ページ読み込み時に高さを測る
+    this.$nextTick(() => {
+      this.updateTopHeight()
     })
 
 
@@ -1592,7 +1616,7 @@ app.component('todo-card', {
   data() {
     return {
       // カテゴリ入力欄にフォーカスしているか
-      categoryFocused: false,
+      categoryFocused: false, 
     }
   },
 
