@@ -1609,17 +1609,17 @@ const app = createApp({
     }
 
     // $nextTick → Vueが画面を更新し終わったあとに実行する
-    this.$nextTick(() => {
-      this.openGroups = this.groupedTodos.map(g => g.label)
-    })
-
     // ページ読み込み時に高さを測る
     this.$nextTick(() => {
+      this.openGroups = this.groupedTodos.map(g => g.label)
       this.updateTopHeight()
-    })
-
-
     
+    
+    // 画面サイズが変わったとき（向き変更など）も高さを測り直す
+    window.addEventListener('resize', () => {
+      this.updateTopHeight() 
+       
+    })   
   }
 
 }) // createApp ここまで
