@@ -481,10 +481,13 @@
     }
     .toast.toast-hide { opacity: 0; }
 
+    /* フッターを隠すクラス */
+    .bottom-bar.hidden {
+      display: none;
+    }
 
-    /* max-height: 500px → 高さが500px以下のときだけ禁止 */
-    /* スマホ横向き（375px前後）は禁止、iPad mini4横向き（768px）は許可 */
-    @media (orientation: landscape) and (max-height: 500px) {
+/* 高さ500px以下の横向き = スマホ横向き → 禁止 */
+@media (orientation: landscape) and (max-height: 500px) {
       .container { padding: 140px 10px 90px; }
       .todo-card { padding: 8px 10px; margin-bottom: 6px; border-radius: 8px; }
       .todo-main-text { font-size: 14px; }
@@ -502,33 +505,6 @@
     /* 横向きのときに「縦向きにしてください」画面を表示する */
     .rotate-message {
       display: none;  /* 普段は隠しておく */
-    }
-
-    /* 横向きになったとき */
-    @media (orientation: landscape) and (max-width: 1100px) {
-      /* アプリを隠す */
-      #app {
-        display: none;
-      }
-      /* メッセージを表示する */
-      .rotate-message {
-        display: flex;
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        gap: 16px;
-        background: #f0f0f0;
-        font-family: sans-serif;
-        font-size: 16px;
-        color: #555;
-        text-align: center;
-        padding: 24px;
-      }
-      .rotate-message .rotate-icon {
-        font-size: 48px;
-      }
     }
 
   </style>
@@ -1598,6 +1574,20 @@ const app = createApp({
         this.updateTopHeight()
       })
     },
+  
+    // 追加フォームが開いたらフッターを隠す・閉じたら戻す
+    showInput(newVal) {
+      const bar = document.querySelector('.bottom-bar')
+      if (bar) bar.classList.toggle('hidden', newVal)
+      this.$nextTick(() => { this.updateTopHeight() })
+    },
+
+    // 編集モードになったらフッターを隠す・終わったら戻す
+    editingId(newVal) {
+      const bar = document.querySelector('.bottom-bar')
+      if (bar) bar.classList.toggle('hidden', newVal !== null)
+    },
+  
   },
 
 
