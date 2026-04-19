@@ -486,26 +486,31 @@
       display: none;
     }
 
-/* 高さ500px以下の横向き = スマホ横向き → 禁止 */
-@media (orientation: landscape) and (max-height: 500px) {
-      .container { padding: 140px 10px 90px; }
-      .todo-card { padding: 8px 10px; margin-bottom: 6px; border-radius: 8px; }
-      .todo-main-text { font-size: 14px; }
-      .tag { font-size: 10px; padding: 1px 6px; }
-      .card-right { gap: 4px; }
-      .card-right button { padding: 4px 6px; font-size: 11px; }
-      .btn-row { gap: 4px; }
-      .btn-row button { padding: 8px 6px; font-size: 12px; }
-      .bottom-bar { padding: 8px 8px 12px; }
-      .bottom-bar button { padding: 5px 10px; font-size: 12px; }
-      .bottom-label { font-size: 9px; }
-      .input-area { padding: 10px; }
-    }
+  /* 普段はメッセージを隠しておく */
+  .rotate-message { display: none; }
 
-    /* 横向きのときに「縦向きにしてください」画面を表示する */
+  /* スマホ横向きのときだけ */
+  @media (orientation: landscape) and (max-height: 500px) {
+    /* アプリを隠す */
+    #app { display: none; }
+    /* メッセージを表示する */
     .rotate-message {
-      display: none;  /* 普段は隠しておく */
+      display: flex;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      background: #f0f0f0;
+      font-family: sans-serif;
+      font-size: 16px;
+      color: #555;
+      text-align: center;
+      padding: 24px;
     }
+    .rotate-message .rotate-icon { font-size: 48px; }
+  }
 
   </style>
 </head>
@@ -518,8 +523,6 @@
   <div>縦向きでご利用ください</div>
   <div style="font-size:13px; color:#aaa;">Please use in portrait mode</div>
   </div>
-
-<div id="app" class="container">
 
   <!-- :style で padding-top を動的に変える -->
   <div id="app" class="container" :style="{ paddingTop: topHeight + 'px' }">
@@ -1547,7 +1550,6 @@ const app = createApp({
           try {
             // タスクをJSON文字列に変換してlocalStorageに保存する
             localStorage.setItem('todos', JSON.stringify(this.todos))
-            localStorage.setItem('todos', JSON.stringify(this.todos))
           } catch (e) {
             // プライベートブラウジングや容量オーバーのときはここに来る
             // アプリはそのまま動かし続ける（クラッシュさせない）
@@ -1569,12 +1571,6 @@ const app = createApp({
     },
 
     // フォームの開閉で上部の高さが変わるので測り直す
-    showInput() {
-      this.$nextTick(() => {
-        this.updateTopHeight()
-      })
-    },
-  
     // 追加フォームが開いたらフッターを隠す・閉じたら戻す
     showInput(newVal) {
       const bar = document.querySelector('.bottom-bar')
