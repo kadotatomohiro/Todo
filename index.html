@@ -1161,8 +1161,6 @@ const app = createApp({
 
     // タスクをコピーして追加フォームを開く（テキスト・カテゴリのみ、期日はリセット）
     copyTodo(todo) {
-      // コピーして作成の前ににフォーマット説明を表示
-      // confirm → OK なら選択に進む、キャンセルなら中止
       const COPYproceed = confirm(this.t.copyInfo)
       if (!COPYproceed) return
 
@@ -1172,9 +1170,11 @@ const app = createApp({
       this.dueDate   = ''
       this.showInput = true
 
-      // コピー後に追加フォームが見えるよう、画面を一番上にスクロールする
-      // behavior: 'smooth' → ふわっと滑らかに動く（'auto'にすると瞬間移動）
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      // $nextTick → Vueが画面の更新を終えてからスクロールする
+      // （showInput = true でフォームが表示されてから動かす）
+      this.$nextTick(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      })
     },
 
 
