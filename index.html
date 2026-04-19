@@ -808,6 +808,7 @@ const app = createApp({
           toastImported:          '{count}件取り込みました',
           toastImportCancelled:   '取込をキャンセルしました',
           toastImportError:       '読み込みに失敗しました',
+          saveError:              '保存できませんでした',
           importConfirmOverwrite: '上書きモードで取り込みますか？\n\n【注意】\n既存のタスクが消えて取込みデータだけになります',
           importConfirmAppend:    '追加モードで取り込みますか？\n\n【注意】\n既存のタスクに追加して取込みます\n\n「キャンセル」→取込みをキャンセル',
           CSVoutputInfo:          
@@ -856,6 +857,7 @@ const app = createApp({
           toastImported:          '{count} tasks imported',
           toastImportCancelled:   'Import cancelled',
           toastImportError:       'Import failed',
+          saveError:              'Could not save',
           importConfirmOverwrite: 'Import in overwrite mode?\n\n【Note】\nExisting tasks will be deleted.',
           importConfirmAppend:    'Import in append mode?\n\n【Note】\nasks will be added to existing ones.\n\nCancel → Cancel import',
           CSVoutputInfo:          
@@ -1505,16 +1507,26 @@ const app = createApp({
   },
 
 
-  // ── ウォッチャー（データの変化を監視する） ──
-  watch: {
-    // todosが変わったら自動でlocalStorageに保存する
-    // deep: true → 配列の中身の変化も検知する
-    todos: {
-      deep: true,
-      handler() {
-        localStorage.setItem('todos', JSON.stringify(this.todos))
-      }
-    },
+    // ── ウォッチャー（データの変化を監視する） ──
+    watch: {
+      // todosが変わったら自動でlocalStorageに保存する
+      // deep: true → 配列の中身の変化も検知する
+      todos: {
+        deep: true,
+        handler() {
+          try {
+            // タスクをJSON文字列に変換してlocalStorageに保存する
+            localStorage.setItem('todos', JSON.stringify(this.todos))
+            localStorage.setItem('todos', JSON.stringify(this.todos))
+          } catch (e) {
+            // プライベートブラウジングや容量オーバーのときはここに来る
+            // アプリはそのまま動かし続ける（クラッシュさせない）
+            // コンソールとトーストで通知
+            console.log(this.t.saveError, e)
+            this.showToast(this.t.saveError)
+          }
+        }
+      },  
 
     // グループ表示が切り替わったとき
     groupBy(newVal) {
@@ -1639,20 +1651,20 @@ app.component('todo-card', {
 
           <!-- 編集ボタン：edit_square アイコン -->
           <!-- @click.stop → クリックがカード全体に伝わらないように止める -->
-<!-- 編集ボタン -->
-<button type="button" @click.stop="$emit('edit', todo)" title="編集">
-  <span class="material-symbols-outlined" translate="no">edit_square</span>
-</button>
+          <!-- 編集ボタン -->
+          <button type="button" @click.stop="$emit('edit', todo)" title="編集">
+            <span class="material-symbols-outlined" translate="no">edit_square</span>
+          </button>
 
-<!-- 削除ボタン -->
-<button type="button" class="delete-btn" @click.stop="$emit('delete', todo)" title="削除">
-  <span class="material-symbols-outlined" translate="no">delete</span>
-</button>
+          <!-- 削除ボタン -->
+          <button type="button" class="delete-btn" @click.stop="$emit('delete', todo)" title="削除">
+            <span class="material-symbols-outlined" translate="no">delete</span>
+          </button>
 
-<!-- コピーして作成ボタン -->
-  <button type="button" class="copy-btn" @click.stop="$emit('clone', todo)">
-  <span class="material-symbols-outlined" translate="no">content_copy</span>
-</button>
+          <!-- コピーして作成ボタン -->
+            <button type="button" class="copy-btn" @click.stop="$emit('clone', todo)">
+            <span class="material-symbols-outlined" translate="no">content_copy</span>
+          </button>
 
         </div>
        </div>
