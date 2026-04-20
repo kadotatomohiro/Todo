@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <meta charset="UTF-8">
 
   <!-- PWAのためにService Worker を登録する -->
   <script>
@@ -18,8 +19,6 @@
       })
     }
   </script>
-
-  <meta charset="UTF-8">
 
   <!-- Androidの一部の端末では initial-scale=1.0 だけでは正しくスケールされないことがあるためminimumとmaximumも設定 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
@@ -1640,6 +1639,9 @@ const app = createApp({
 
   // ── マウント（ページが読み込まれたとき1回だけ実行される） ──
   mounted() {
+  // PWA起動時にフッターが隠れたままになるのを防ぐ
+  const bar = document.querySelector('.bottom-bar')
+  if (bar) bar.classList.remove('hidden')
 
   // ブラウザのスクロール位置の自動復元をオフにする(リロード時に一覧ビューでカードの表示が途中から見えるのを防ぐ)
   // 'manual' → 「自分でスクロール位置を管理する」という意味
@@ -1675,11 +1677,7 @@ const app = createApp({
     
     // 画面サイズが変わったとき（向き変更など）も高さを測り直す
     window.addEventListener('resize', () => {
-      this.updateTopHeight()
-
-        // フッターを確実に表示状態にリセットする
-    const bar = document.querySelector('.bottom-bar')
-    if (bar) bar.classList.remove('hidden')  
+      this.updateTopHeight()  
     })
   }
 
