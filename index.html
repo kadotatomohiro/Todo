@@ -1657,8 +1657,12 @@ const app = createApp({
     })
     
     // 画面サイズが変わったとき（向き変更など）も高さを測り直す
-      window.addEventListener('resize', () => {
+    window.addEventListener('resize', () => {
       this.updateTopHeight()
+
+        // フッターを確実に表示状態にリセットする
+    const bar = document.querySelector('.bottom-bar')
+    if (bar) bar.classList.remove('hidden')  
     })
   }
 
