@@ -303,13 +303,15 @@
     .edit-inputs .btn-row button {
       flex-direction: column;  /* アイコンとテキストを縦並びにする */
       gap: 2px;                /* アイコンとテキストの間隔を狭くする */
-      padding: 6px 4px;        /* 上下の余白を小さくする */
+      padding: 6px 2px;        /* 上下の余白を小さくする */
       font-size: 10px;         /* テキストを小さくする */
+      min-width: 0;        　　　/* ボタンを縮めるようにする */
     }
 
     /* 編集モードのアイコンサイズ */
     .edit-inputs .btn-row .material-symbols-outlined {
-      font-size: 20px;
+      font-size: 18px;
+      gap: 4px;
     }
 
     /* 色別ボタン */
