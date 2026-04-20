@@ -2,7 +2,10 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Androidの一部の端末では initial-scale=1.0 だけでは正しくスケールされないことがあるためminimumとmaximumも設定 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+  
   <title>ToDo</title>
 
     <!-- PWA設定ファイルの読み込み -->
@@ -1810,33 +1813,33 @@ app.component('todo-card', {
         </div>
 
         <!-- 更新・キャンセル・削除ボタン・コピーボタン（横並び） -->
-<div class="btn-row">
+        <div class="btn-row">
 
-  <!-- 更新ボタン：save アイコン＋テキスト -->
-  <button type="button" @click="$emit('save')">
-    <span class="material-symbols-outlined" translate="no">save</span>
-    {{ t.save }}
-  </button>
+          <!-- 更新ボタン：save アイコン＋テキスト -->
+          <button type="button" @click="$emit('save')">
+            <span class="material-symbols-outlined" translate="no">save</span>
+            {{ t.save }}
+          </button>
 
-  <!-- 戻るボタン：undo アイコン＋テキスト -->
-  <button type="button" class="cancel-btn" @click="$emit('cancel')">
-    <span class="material-symbols-outlined" translate="no">cancel</span>
-    {{ t.cancel }}
-  </button>
+          <!-- 戻るボタン：undo アイコン＋テキスト -->
+          <button type="button" class="cancel-btn" @click="$emit('cancel')">
+            <span class="material-symbols-outlined" translate="no">cancel</span>
+            {{ t.cancel }}
+          </button>
 
-  <!-- 削除ボタン：delete アイコン＋テキスト -->
-  <button type="button" class="delete-btn" @click="$emit('delete', todo)">
-    <span class="material-symbols-outlined" translate="no">delete</span>
-    {{ t.delete }}
-  </button>
+          <!-- 削除ボタン：delete アイコン＋テキスト -->
+          <button type="button" class="delete-btn" @click="$emit('delete', todo)">
+            <span class="material-symbols-outlined" translate="no">delete</span>
+            {{ t.delete }}
+          </button>
 
-  <!-- コピーボタン：content_copy アイコン＋テキスト -->
-  <button type="button" class="copy-btn" @click="$emit('clone', todo)">
-    <span class="material-symbols-outlined" translate="no">content_copy</span>
-    Copy
-  </button>
+          <!-- コピーボタン：content_copy アイコン＋テキスト -->
+          <button type="button" class="copy-btn" @click="$emit('clone', todo)">
+            <span class="material-symbols-outlined" translate="no">content_copy</span>
+            Copy
+          </button>
 
-</div>
+        </div>
 
       </div>
     </div>
