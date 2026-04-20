@@ -88,7 +88,7 @@
       transform: translateX(-50%);
       width: 100%;
       max-width: 1200px;
-      background: rgba(83, 81, 81, 0.97);
+      background: rgba(231, 7, 7, 0.97);
       padding: 12px 16px 8px;
       border-bottom: 1px solid #e0e0e0;
       backdrop-filter: blur(8px);
@@ -178,6 +178,7 @@
       padding-left: 2px;
     }
     .search-status.is-searching { color: #007AFF; }
+
 
     /* =============================================
        タスク追加フォーム
@@ -297,21 +298,6 @@
     /* btn-row 内のアイコンサイズ */
     .btn-row .material-symbols-outlined {
       font-size: 16px; /* テキストに合わせて少し小さめにする */
-    }
-
-    /* 編集モードのボタンだけアイコン上・テキスト下のレイアウトにする */
-    .edit-inputs .btn-row button {
-      flex-direction: column;  /* アイコンとテキストを縦並びにする */
-      gap: 2px;                /* アイコンとテキストの間隔を狭くする */
-      padding: 6px 2px;        /* 上下の余白を小さくする */
-      font-size: 10px;         /* テキストを小さくする */
-      min-width: 0;        　　　/* ボタンを縮めるようにする */
-    }
-
-    /* 編集モードのアイコンサイズ */
-    .edit-inputs .btn-row .material-symbols-outlined {
-      font-size: 18px;
-      gap: 4px;
     }
 
     /* 色別ボタン */
@@ -441,6 +427,19 @@
       gap: 8px;
     }
 
+    /* 編集モードのボタンだけアイコン上・テキスト下のレイアウトにする */
+    .edit-inputs .btn-row button {
+      flex-direction: column;  /* アイコンとテキストを縦並びにする */
+      gap: 2px;                /* アイコンとテキストの間隔を狭くする */
+      padding: 6px 4px;        /* 上下の余白を小さくする */
+      font-size: 10px;         /* テキストを小さくする */
+    }
+
+    /* 編集モードのアイコンサイズ */
+    .edit-inputs .btn-row .material-symbols-outlined {
+      font-size: 20px;
+    }
+
     /* =============================================
        グループ表示
        ============================================= */
@@ -504,6 +503,7 @@
       color: #fff;
       border-color: #333;
     }
+
 
     /* =============================================
        トースト通知
@@ -1631,12 +1631,12 @@ const app = createApp({
     // 追加フォームが開いたらフッターを隠す・閉じたら戻す
     showInput(newVal) {
       this.$nextTick(() => { this.updateTopHeight() })
-    },
+    }, 
+  },
 
 
   // ── マウント（ページが読み込まれたとき1回だけ実行される） ──
   mounted() {
-
   // ブラウザのスクロール位置の自動復元をオフにする(リロード時に一覧ビューでカードの表示が途中から見えるのを防ぐ)
   // 'manual' → 「自分でスクロール位置を管理する」という意味
   // 'auto'   → ブラウザが自動で復元する（デフォルト）
