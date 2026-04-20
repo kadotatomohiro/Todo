@@ -561,15 +561,16 @@
   <div style="font-size:13px; color:#aaa;">Please use in portrait mode</div>
   </div>
 
-  <!--
+  <!-- ══════════════════════════════════════
   #app
-    └── .container（padding-topを動的に管理）
-    ├── .input-area（追加フォーム・v-ifで表示制御）
-    ├── v-if="groupBy === 'none'"（一覧モード）
-    ├── v-else（グループモード）
-    ├── .toast（トースト通知）
-    └── .bottom-bar（下部固定
-  -->
+  　└── .container（padding-topを動的に管理
+        　├── .top-fixed（上部固定）
+        　├── .input-area（追加フォーム・v-ifで表示制御）
+        　├── v-if="groupBy === 'none'"（一覧モード）
+        　├── v-else（グループモード）
+        　├── .toast（トースト通知）
+        　└── .bottom-bar（下部固定）
+  ══════════════════════════════════════ -->
   <div id="app">
 
     <!-- ↓ padding-top をVueで動的に変える（ヘッダーの高さ + 余白12px）-->
