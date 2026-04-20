@@ -524,160 +524,163 @@
   <div style="font-size:13px; color:#aaa;">Please use in portrait mode</div>
   </div>
 
-  <!-- :style で padding-top を動的に変える -->
-  <div id="app" class="container" :style="{ paddingTop: topHeight + 'px' }">
+  <div id="app">
+    <!-- ↓ padding-top をここで管理する（#appの中！） -->
+    <div class="container" :style="{ paddingTop: topHeight + 'px' }">
 
-  <!-- ══ 上部固定エリア ══ -->
-  <div class="top-fixed">
+      <!-- ══ 上部固定エリア ══ -->
+      <div class="top-fixed">
 
-    <!-- 言語切替（左）・入出力ボタン（右）を1行に -->
-    <div class="top-actions">
-      <div class="lang-switch">
-        <button type="button" @click="currentLang = 'ja'" :class="{ active: currentLang === 'ja' }">ja</button>
-        <button type="button" @click="currentLang = 'en'" :class="{ active: currentLang === 'en' }">en</button>
-      </div>
-      <div class="io-bar">
-        <button type="button" class="io-btn" @click="exportCSV">CSV</button>
-        <button type="button" class="io-btn" @click="exportJSON">JSON</button>
-        <button type="button" class="io-btn" @click="triggerImport">{{ t.importFile }}</button>
-        <!-- ファイル選択は非表示のinputで処理する -->
-        <!-- accept → 選べるファイルの種類を制限する -->
+        <!-- 言語切替（左）・入出力ボタン（右）を1行に -->
+        <div class="top-actions">
+          <div class="lang-switch">
+            <button type="button" @click="currentLang = 'ja'" :class="{ active: currentLang === 'ja' }">ja</button>
+            <button type="button" @click="currentLang = 'en'" :class="{ active: currentLang === 'en' }">en</button>
+          </div>
+          <div class="io-bar">
+            <button type="button" class="io-btn" @click="exportCSV">CSV</button>
+            <button type="button" class="io-btn" @click="exportJSON">JSON</button>
+            <button type="button" class="io-btn" @click="triggerImport">{{ t.importFile }}</button>
+            <!-- ファイル選択は非表示のinputで処理する -->
+            <!-- accept → 選べるファイルの種類を制限する -->
+            <input
+              type="file"
+              ref="importFile"
+              accept=".csv,.json"
+              style="display:none"
+              @change="importFile"
+            >
+          </div>
+        </div>
+
+        <!-- 検索欄と＋ボタン -->
+        <div class="top-row">
+          <input
+            class="search-input"
+            :class="{ searching: searchText.trim() }"
+            v-model="searchText"
+            :placeholder="t.placeholderSearch"
+            @keyup.enter="onSearchEnter"
+            @focus="cancelEditIfNeeded"
+          >
+          <!-- showInput が true のとき × 、false のとき ＋ -->
+          <button
+            type="button"
+            class="toggle-btn"
+            :class="{ open: showInput }"
+            @click="showInput ? closeInput() : openInput()"
+          >{{ showInput ? '×' : '＋' }}</button>
+        </div>
+
+        <!-- 件数表示：検索中は青文字 -->
+        <div class="search-status" :class="{ 'is-searching': searchText.trim() }">
+          {{ filteredTodos.length }}{{ t.statusOf }}{{ todos.length }}{{ t.statusItems }}
+        </div>
+
+      </div><!-- /.top-fixed -->
+
+
+      <!-- ══ タスク追加フォーム（＋ボタンを押したときだけ表示） ══ -->
+      <div v-if="showInput" class="input-area">
+
+        <!-- タスク入力欄 最大120文字-->
+        
+        <textarea
+          v-model="newTodo"
+          :placeholder="t.placeholderTodo"
+          maxlength="120"
+          rows="1"
+          @input="newTodo = newTodo.slice(0, 120)"
+          @focus="cancelEditIfNeeded"
+          class="todo-textarea"
+        ></textarea>
+
+        <!-- カテゴリ入力欄：フォーカス中かつ候補があるとき青枠で一体化 最大文字数20-->
         <input
-          type="file"
-          ref="importFile"
-          accept=".csv,.json"
-          style="display:none"
-          @change="importFile"
+          v-model="category"
+          :placeholder="t.placeholderCategory"
+          maxlength="20"
+          :class="{ 'category-input-active': categoryFocused && filteredCategories.length > 0 }"
+          @input="category = category.slice(0, 20)" 
+          @focus="categoryFocused = true; cancelEditIfNeeded()"
+          @blur="setTimeout(() => { categoryFocused = false }, 200)"
         >
+
+        <!-- カテゴリ候補：フォーカス中かつ候補があるときだけ表示 -->
+        <template v-if="categoryFocused && filteredCategories.length > 0">
+          <div class="category-dropdown-label">{{ t.categorySuggestions }}</div>
+          <div class="category-dropdown">
+            <div
+              v-for="cat in filteredCategories"
+              :key="cat"
+              class="category-option"
+              @click="selectCategory(cat)"
+            >▸ {{ cat }}</div>
+          </div>
+        </template>
+
+        <!-- 期日入力欄 -->
+        <div class="date-row">
+          <span class="date-label">{{ t.datePlaceholder }}</span>
+          <input type="date" v-model="dueDate">
+        </div>
+
+      <!-- 追加・キャンセルボタン（横並び） -->
+      <div class="btn-row">
+
+        <!-- 追加ボタン：add_card アイコン＋テキスト -->
+        <button type="button" @click="addTodo">
+          <!-- translate="no" → アイコン名が翻訳されないように -->
+          <span class="material-symbols-outlined" translate="no">add_circle</span>
+          {{ t.add }}
+        </button>
+
+        <!-- キャンセルボタン：アイコン＋テキスト -->
+            <button type="button" class="cancel-add-btn" @click="closeInput">
+          <!-- translate="no" → アイコン名が翻訳されないように -->
+          <span class="material-symbols-outlined" translate="no">cancel</span>
+          {{ t.cancel }}
+        </button>
+
       </div>
+
+      </div><!-- /.input-area -->
+
+
+      <!-- ══ 一覧モード（グループなし） ══ -->
+      <!--
+        todo-card：下で定義したコンポーネント（部品）
+        :todo                    → 1件分のタスクデータを渡す
+        :editing-id              → 編集中のタスクIDを渡す
+        :t                       → 翻訳テキストを渡す
+        :format-date-fn          → 日付フォーマット関数を渡す
+        :filtered-categories-edit → 編集時のカテゴリ候補を渡す
+        @card-click → カードをタップしたとき
+        @edit       → 編集ボタンを押したとき
+        @delete     → 削除ボタンを押したとき
+        @save       → 更新ボタンを押したとき
+        @cancel     → キャンセルボタンを押したとき
+        @clone       → コピーボタンを押したとき
+      -->
+          <!-- computedのsortedTodosを使って一覧モードの並び替え順を設定-->
+          <div v-if="groupBy === 'none'">
+          <todo-card
+            v-for="todo in sortedTodos" 
+        :key="todo.id"
+        :todo="todo"
+        :editing-id="editingId"
+        :t="t"
+        :format-date-fn="formatDate"
+        :filtered-categories-edit="filteredCategoriesEdit"
+        @card-click="startEdit"
+        @edit="startEdit"
+        @delete="deleteTodo"
+        @save="finishEdit"
+        @cancel="cancelEdit"
+        @clone="copyTodo"
+      ></todo-card>
+
     </div>
-
-    <!-- 検索欄と＋ボタン -->
-    <div class="top-row">
-      <input
-        class="search-input"
-        :class="{ searching: searchText.trim() }"
-        v-model="searchText"
-        :placeholder="t.placeholderSearch"
-        @keyup.enter="onSearchEnter"
-        @focus="cancelEditIfNeeded"
-      >
-      <!-- showInput が true のとき × 、false のとき ＋ -->
-      <button
-        type="button"
-        class="toggle-btn"
-        :class="{ open: showInput }"
-        @click="showInput ? closeInput() : openInput()"
-      >{{ showInput ? '×' : '＋' }}</button>
-    </div>
-
-    <!-- 件数表示：検索中は青文字 -->
-    <div class="search-status" :class="{ 'is-searching': searchText.trim() }">
-      {{ filteredTodos.length }}{{ t.statusOf }}{{ todos.length }}{{ t.statusItems }}
-    </div>
-
-  </div><!-- /.top-fixed -->
-
-
-  <!-- ══ タスク追加フォーム（＋ボタンを押したときだけ表示） ══ -->
-  <div v-if="showInput" class="input-area">
-
-    <!-- タスク入力欄 最大120文字-->
-    
-    <textarea
-      v-model="newTodo"
-      :placeholder="t.placeholderTodo"
-      maxlength="120"
-      rows="1"
-      @input="newTodo = newTodo.slice(0, 120)"
-      @focus="cancelEditIfNeeded"
-      class="todo-textarea"
-    ></textarea>
-
-    <!-- カテゴリ入力欄：フォーカス中かつ候補があるとき青枠で一体化 最大文字数20-->
-    <input
-      v-model="category"
-      :placeholder="t.placeholderCategory"
-      maxlength="20"
-      :class="{ 'category-input-active': categoryFocused && filteredCategories.length > 0 }"
-      @input="category = category.slice(0, 20)" 
-      @focus="categoryFocused = true; cancelEditIfNeeded()"
-      @blur="setTimeout(() => { categoryFocused = false }, 200)"
-    >
-
-    <!-- カテゴリ候補：フォーカス中かつ候補があるときだけ表示 -->
-    <template v-if="categoryFocused && filteredCategories.length > 0">
-      <div class="category-dropdown-label">{{ t.categorySuggestions }}</div>
-      <div class="category-dropdown">
-        <div
-          v-for="cat in filteredCategories"
-          :key="cat"
-          class="category-option"
-          @click="selectCategory(cat)"
-        >▸ {{ cat }}</div>
-      </div>
-    </template>
-
-    <!-- 期日入力欄 -->
-    <div class="date-row">
-      <span class="date-label">{{ t.datePlaceholder }}</span>
-      <input type="date" v-model="dueDate">
-    </div>
-
-  <!-- 追加・キャンセルボタン（横並び） -->
-  <div class="btn-row">
-
-    <!-- 追加ボタン：add_card アイコン＋テキスト -->
-    <button type="button" @click="addTodo">
-      <!-- translate="no" → アイコン名が翻訳されないように -->
-      <span class="material-symbols-outlined" translate="no">add_circle</span>
-      {{ t.add }}
-    </button>
-
-    <!-- キャンセルボタン：アイコン＋テキスト -->
-        <button type="button" class="cancel-add-btn" @click="closeInput">
-      <!-- translate="no" → アイコン名が翻訳されないように -->
-      <span class="material-symbols-outlined" translate="no">cancel</span>
-      {{ t.cancel }}
-    </button>
-
-  </div>
-
-  </div><!-- /.input-area -->
-
-
-  <!-- ══ 一覧モード（グループなし） ══ -->
-  <!--
-    todo-card：下で定義したコンポーネント（部品）
-    :todo                    → 1件分のタスクデータを渡す
-    :editing-id              → 編集中のタスクIDを渡す
-    :t                       → 翻訳テキストを渡す
-    :format-date-fn          → 日付フォーマット関数を渡す
-    :filtered-categories-edit → 編集時のカテゴリ候補を渡す
-    @card-click → カードをタップしたとき
-    @edit       → 編集ボタンを押したとき
-    @delete     → 削除ボタンを押したとき
-    @save       → 更新ボタンを押したとき
-    @cancel     → キャンセルボタンを押したとき
-    @clone       → コピーボタンを押したとき
-  -->
-      <!-- computedのsortedTodosを使って一覧モードの並び替え順を設定-->
-      <div v-if="groupBy === 'none'">
-        <todo-card
-          v-for="todo in sortedTodos" 
-      :key="todo.id"
-      :todo="todo"
-      :editing-id="editingId"
-      :t="t"
-      :format-date-fn="formatDate"
-      :filtered-categories-edit="filteredCategoriesEdit"
-      @card-click="startEdit"
-      @edit="startEdit"
-      @delete="deleteTodo"
-      @save="finishEdit"
-      @cancel="cancelEdit"
-      @clone="copyTodo"
-    ></todo-card>
   </div>
 
 
@@ -1609,11 +1612,18 @@ const app = createApp({
     }
 
     // $nextTick → Vueが画面を更新し終わったあとに実行する
+
     // ページ読み込み時に高さを測る
     this.$nextTick(() => {
       this.openGroups = this.groupedTodos.map(g => g.label)
       this.updateTopHeight()
     }) 
+
+    // フォント読み込み完了後にも高さを測り直す
+    // document.fonts.ready → 全フォントの読み込みが終わったら実行する
+    document.fonts.ready.then(() => {
+      this.updateTopHeight()
+    })
     
     // 画面サイズが変わったとき（向き変更など）も高さを測り直す
       window.addEventListener('resize', () => {
