@@ -427,7 +427,6 @@
       gap: 8px;
     }
 
-
     /* =============================================
        グループ表示
        ============================================= */
@@ -492,7 +491,6 @@
       border-color: #333;
     }
 
-
     /* =============================================
        トースト通知
        ============================================= */
@@ -513,11 +511,6 @@
       transition: opacity 0.4s;
     }
     .toast.toast-hide { opacity: 0; }
-
-    /* フッターを隠すクラス */
-    .bottom-bar.hidden {
-      display: none;
-    }
 
   /* 普段はメッセージを隠しておく */
   .rotate-message { display: none; }
@@ -1623,25 +1616,12 @@ const app = createApp({
     // フォームの開閉で上部の高さが変わるので測り直す
     // 追加フォームが開いたらフッターを隠す・閉じたら戻す
     showInput(newVal) {
-      const bar = document.querySelector('.bottom-bar')
-      if (bar) bar.classList.toggle('hidden', newVal)
       this.$nextTick(() => { this.updateTopHeight() })
     },
-
-    // 編集モードになったらフッターを隠す・終わったら戻す
-    editingId(newVal) {
-      const bar = document.querySelector('.bottom-bar')
-      if (bar) bar.classList.toggle('hidden', newVal !== null)
-    },
-  
-  },
 
 
   // ── マウント（ページが読み込まれたとき1回だけ実行される） ──
   mounted() {
-  // PWA起動時にフッターが隠れたままになるのを防ぐ
-  const bar = document.querySelector('.bottom-bar')
-  if (bar) bar.classList.remove('hidden')
 
   // ブラウザのスクロール位置の自動復元をオフにする(リロード時に一覧ビューでカードの表示が途中から見えるのを防ぐ)
   // 'manual' → 「自分でスクロール位置を管理する」という意味
