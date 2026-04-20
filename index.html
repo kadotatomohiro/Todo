@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+
+  <!-- PWAのためにService Worker を登録する -->
+  <script>
+    // Service Worker に対応しているブラウザかどうか確認する
+    if ('serviceWorker' in navigator) {
+      // ページが読み込まれたあとに登録する
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(() => {
+            console.log('Service Worker Registration successful！')
+          })
+          .catch(err => {
+            console.log('Service Worker Registration failed:', err)
+          })
+      })
+    }
+  </script>
+  
   <meta charset="UTF-8">
 
   <!-- Androidの一部の端末では initial-scale=1.0 だけでは正しくスケールされないことがあるためminimumとmaximumも設定 -->
@@ -531,22 +549,7 @@
   </style>
 </head>
 
-  <!-- PWAのためにService Worker を登録する -->
-  <script>
-    // Service Worker に対応しているブラウザかどうか確認する
-    if ('serviceWorker' in navigator) {
-      // ページが読み込まれたあとに登録する
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(() => {
-            console.log('Service Worker Registration successful！')
-          })
-          .catch(err => {
-            console.log('Service Worker Registration failed:', err)
-          })
-      })
-    }
-  </script>
+
 
 <body>
 
