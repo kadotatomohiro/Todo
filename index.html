@@ -179,7 +179,6 @@
     }
     .search-status.is-searching { color: #007AFF; }
 
-
     /* =============================================
        タスク追加フォーム
        ============================================= */
@@ -298,6 +297,19 @@
     /* btn-row 内のアイコンサイズ */
     .btn-row .material-symbols-outlined {
       font-size: 16px; /* テキストに合わせて少し小さめにする */
+    }
+
+    /* 編集モードのボタンだけアイコン上・テキスト下のレイアウトにする */
+    .edit-inputs .btn-row button {
+      flex-direction: column;  /* アイコンとテキストを縦並びにする */
+      gap: 2px;                /* アイコンとテキストの間隔を狭くする */
+      padding: 6px 4px;        /* 上下の余白を小さくする */
+      font-size: 10px;         /* テキストを小さくする */
+    }
+
+    /* 編集モードのアイコンサイズ */
+    .edit-inputs .btn-row .material-symbols-outlined {
+      font-size: 20px;
     }
 
     /* 色別ボタン */
