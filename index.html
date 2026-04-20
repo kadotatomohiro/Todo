@@ -525,8 +525,8 @@
   </div>
 
   <div id="app">
-    <!-- ↓ padding-top をここで管理する（#appの中！） -->
-    <div class="container" :style="{ paddingTop: topHeight + 'px' }">
+    <!-- ↓ padding-top をここで管理する　+ 12は余白 -->
+    <div class="container" :style="{ paddingTop: (topHeight + 12) + 'px' }">
 
       <!-- ══ 上部固定エリア ══ -->
       <div class="top-fixed">
