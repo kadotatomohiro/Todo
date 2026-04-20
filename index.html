@@ -670,10 +670,10 @@
         </button>
 
         <!-- キャンセルボタン：アイコン＋テキスト -->
-            <button type="button" class="cancel-add-btn" @click="closeInput">
-          <!-- translate="no" → アイコン名が翻訳されないように -->
-          <span class="material-symbols-outlined" translate="no">cancel</span>
-          {{ t.cancel }}
+        <button type="button" class="cancel-add-btn" @click="closeInput">
+        <!-- translate="no" → アイコン名が翻訳されないように -->
+        <span class="material-symbols-outlined" translate="no">cancel</span>
+        {{ t.cancel }}
         </button>
 
       </div>
@@ -696,7 +696,7 @@
         @cancel     → キャンセルボタンを押したとき
         @clone       → コピーボタンを押したとき
       -->
-          <!-- computedのsortedTodosを使って一覧モードの並び替え順を設定-->
+      <!-- computedのsortedTodosを使って一覧モードの並び替え順を設定-->
           <div v-if="groupBy === 'none'">
           <todo-card
             v-for="todo in sortedTodos" 
