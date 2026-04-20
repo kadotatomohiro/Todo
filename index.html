@@ -18,7 +18,7 @@
       })
     }
   </script>
-  
+
   <meta charset="UTF-8">
 
   <!-- Androidの一部の端末では initial-scale=1.0 だけでは正しくスケールされないことがあるためminimumとmaximumも設定 -->
@@ -561,19 +561,35 @@
   <div style="font-size:13px; color:#aaa;">Please use in portrait mode</div>
   </div>
 
+  <!--
+  #app
+    └── .container（padding-topを動的に管理）
+    ├── .input-area（追加フォーム・v-ifで表示制御）
+    ├── v-if="groupBy === 'none'"（一覧モード）
+    ├── v-else（グループモード）
+    ├── .toast（トースト通知）
+    └── .bottom-bar（下部固定
+  -->
   <div id="app">
-    <!-- ↓ padding-top をここで管理する　+ 12は余白 -->
+
+    <!-- ↓ padding-top をVueで動的に変える（ヘッダーの高さ + 余白12px）-->
     <div class="container" :style="{ paddingTop: (topHeight + 12) + 'px' }">
 
-      <!-- ══ 上部固定エリア ══ -->
+      <!-- ══════════════════════════════════════
+          上部固定エリア（スクロールしても常に上に固定）
+          ══════════════════════════════════════ -->
       <div class="top-fixed">
 
         <!-- 言語切替（左）・入出力ボタン（右）を1行に -->
         <div class="top-actions">
+
+          <!-- 言語切替ボタン -->
           <div class="lang-switch">
             <button type="button" @click="currentLang = 'ja'" :class="{ active: currentLang === 'ja' }">ja</button>
             <button type="button" @click="currentLang = 'en'" :class="{ active: currentLang === 'en' }">en</button>
           </div>
+
+          <!-- CSV・JSON出力・取込ボタン -->
           <div class="io-bar">
             <button type="button" class="io-btn" @click="exportCSV">CSV</button>
             <button type="button" class="io-btn" @click="exportJSON">JSON</button>
@@ -588,9 +604,10 @@
               @change="importFile"
             >
           </div>
-        </div>
 
-        <!-- 検索欄と＋ボタン -->
+        </div><!-- /.top-actions -->
+
+        <!-- 検索欄と＋ボタンを横に並べる -->
         <div class="top-row">
           <input
             class="search-input"
@@ -600,16 +617,16 @@
             @keyup.enter="onSearchEnter"
             @focus="cancelEditIfNeeded"
           >
-          <!-- showInput が true のとき × 、false のとき ＋ -->
+          <!-- showInput が true のとき × 、false のとき ＋ を表示 -->
           <button
             type="button"
             class="toggle-btn"
             :class="{ open: showInput }"
             @click="showInput ? closeInput() : openInput()"
           >{{ showInput ? '×' : '＋' }}</button>
-        </div>
+        </div><!-- /.top-row -->
 
-        <!-- 件数表示：検索中は青文字 -->
+        <!-- 件数表示：検索中は青文字になる -->
         <div class="search-status" :class="{ 'is-searching': searchText.trim() }">
           {{ filteredTodos.length }}{{ t.statusOf }}{{ todos.length }}{{ t.statusItems }}
         </div>
@@ -617,11 +634,13 @@
       </div><!-- /.top-fixed -->
 
 
-      <!-- ══ タスク追加フォーム（＋ボタンを押したときだけ表示） ══ -->
+      <!-- ══════════════════════════════════════
+          タスク追加フォーム
+          ＋ボタンを押したときだけ表示（v-if で制御）
+          ══════════════════════════════════════ -->
       <div v-if="showInput" class="input-area">
 
-        <!-- タスク入力欄 最大120文字-->
-        
+        <!-- タスク入力欄（最大120文字） -->
         <textarea
           v-model="newTodo"
           :placeholder="t.placeholderTodo"
@@ -632,18 +651,19 @@
           class="todo-textarea"
         ></textarea>
 
-        <!-- カテゴリ入力欄：フォーカス中かつ候補があるとき青枠で一体化 最大文字数20-->
+        <!-- カテゴリ入力欄（最大20文字） -->
+        <!-- フォーカス中かつ候補があるとき青枠で候補リストと一体化する -->
         <input
           v-model="category"
           :placeholder="t.placeholderCategory"
           maxlength="20"
           :class="{ 'category-input-active': categoryFocused && filteredCategories.length > 0 }"
-          @input="category = category.slice(0, 20)" 
+          @input="category = category.slice(0, 20)"
           @focus="categoryFocused = true; cancelEditIfNeeded()"
           @blur="setTimeout(() => { categoryFocused = false }, 200)"
         >
 
-        <!-- カテゴリ候補：フォーカス中かつ候補があるときだけ表示 -->
+        <!-- カテゴリ候補リスト：フォーカス中かつ候補があるときだけ表示 -->
         <template v-if="categoryFocused && filteredCategories.length > 0">
           <div class="category-dropdown-label">{{ t.categorySuggestions }}</div>
           <div class="category-dropdown">
@@ -662,86 +682,31 @@
           <input type="date" v-model="dueDate">
         </div>
 
-      <!-- 追加・キャンセルボタン（横並び） -->
-      <div class="btn-row">
-
-        <!-- 追加ボタン：add_card アイコン＋テキスト -->
-        <button type="button" @click="addTodo">
-          <!-- translate="no" → アイコン名が翻訳されないように -->
-          <span class="material-symbols-outlined" translate="no">add_circle</span>
-          {{ t.add }}
-        </button>
-
-        <!-- キャンセルボタン：アイコン＋テキスト -->
-        <button type="button" class="cancel-add-btn" @click="closeInput">
-        <!-- translate="no" → アイコン名が翻訳されないように -->
-        <span class="material-symbols-outlined" translate="no">cancel</span>
-        {{ t.cancel }}
-        </button>
-
-      </div>
+        <!-- 追加・キャンセルボタン（横並び） -->
+        <div class="btn-row">
+          <button type="button" @click="addTodo">
+            <span class="material-symbols-outlined" translate="no">add_circle</span>
+            {{ t.add }}
+          </button>
+          <button type="button" class="cancel-add-btn" @click="closeInput">
+            <span class="material-symbols-outlined" translate="no">cancel</span>
+            {{ t.cancel }}
+          </button>
+        </div>
 
       </div><!-- /.input-area -->
 
 
-      <!-- ══ 一覧モード（グループなし） ══ -->
-      <!--
-        todo-card：下で定義したコンポーネント（部品）
-        :todo                    → 1件分のタスクデータを渡す
-        :editing-id              → 編集中のタスクIDを渡す
-        :t                       → 翻訳テキストを渡す
-        :format-date-fn          → 日付フォーマット関数を渡す
-        :filtered-categories-edit → 編集時のカテゴリ候補を渡す
-        @card-click → カードをタップしたとき
-        @edit       → 編集ボタンを押したとき
-        @delete     → 削除ボタンを押したとき
-        @save       → 更新ボタンを押したとき
-        @cancel     → キャンセルボタンを押したとき
-        @clone       → コピーボタンを押したとき
-      -->
-      <!-- computedのsortedTodosを使って一覧モードの並び替え順を設定-->
-          <div v-if="groupBy === 'none'">
-          <todo-card
-            v-for="todo in sortedTodos" 
-        :key="todo.id"
-        :todo="todo"
-        :editing-id="editingId"
-        :t="t"
-        :format-date-fn="formatDate"
-        :filtered-categories-edit="filteredCategoriesEdit"
-        @card-click="startEdit"
-        @edit="startEdit"
-        @delete="deleteTodo"
-        @save="finishEdit"
-        @cancel="cancelEdit"
-        @clone="copyTodo"
-      ></todo-card>
+      <!-- ══════════════════════════════════════
+          タスク一覧エリア
+          groupBy の値で「一覧モード」か「グループモード」かが切り替わる
+          ══════════════════════════════════════ -->
 
-    </div>
-  </div>
-
-
-  <!-- ══ グループモード（カテゴリ or 期日でまとめる） ══ -->
-  <div v-else>
-    <div v-for="group in groupedTodos" :key="group.label">
-
-      <!-- グループの見出し（クリックで開閉） -->
-      <div class="group-header" @click="toggleGroup(group.label)">
-        <div class="group-header-left">
-          <span class="group-title">{{ group.label }}</span>
-          <span class="group-count">{{ group.todos.length }}件</span>
-        </div>
-        <!-- ▼が回転して開閉を示す -->
-        <span
-          class="group-arrow"
-          :class="{ closed: !openGroups.includes(group.label) }"
-        >▼</span>
-      </div>
-
-      <!-- グループ内のタスク（開いているときだけ表示） -->
-      <div v-if="openGroups.includes(group.label)">
+      <!-- 一覧モード（groupBy === 'none' のとき） -->
+      <!-- sortedTodos：新しい順に並べたタスク一覧（computedで計算済み） -->
+      <div v-if="groupBy === 'none'">
         <todo-card
-          v-for="todo in group.todos"
+          v-for="todo in sortedTodos"
           :key="todo.id"
           :todo="todo"
           :editing-id="editingId"
@@ -757,29 +722,74 @@
         ></todo-card>
       </div>
 
-    </div>
-  </div>
+      <!-- グループモード（カテゴリ or 期日でまとめる） -->
+      <div v-else>
+        <div v-for="group in groupedTodos" :key="group.label">
+
+          <!-- グループの見出し：クリックで開閉する -->
+          <div class="group-header" @click="toggleGroup(group.label)">
+            <div class="group-header-left">
+              <span class="group-title">{{ group.label }}</span>
+              <span class="group-count">{{ group.todos.length }}件</span>
+            </div>
+            <!-- ▼が回転して開閉を示す（CSSのtransitionでアニメーション） -->
+            <span
+              class="group-arrow"
+              :class="{ closed: !openGroups.includes(group.label) }"
+            >▼</span>
+          </div>
+
+          <!-- グループ内のタスク一覧（開いているときだけ表示） -->
+          <div v-if="openGroups.includes(group.label)">
+            <todo-card
+              v-for="todo in group.todos"
+              :key="todo.id"
+              :todo="todo"
+              :editing-id="editingId"
+              :t="t"
+              :format-date-fn="formatDate"
+              :filtered-categories-edit="filteredCategoriesEdit"
+              @card-click="startEdit"
+              @edit="startEdit"
+              @delete="deleteTodo"
+              @save="finishEdit"
+              @cancel="cancelEdit"
+              @clone="copyTodo"
+            ></todo-card>
+          </div>
+
+        </div>
+      </div><!-- /グループモード -->
 
 
-  <!-- トースト通知：メッセージがあるときだけ表示 -->
-  <div
-    v-if="toastMessage"
-    class="toast"
-    :class="{ 'toast-hide': toastHiding }"
-  >{{ toastMessage }}</div>
+      <!-- ══════════════════════════════════════
+          トースト通知
+          toastMessage があるときだけ表示・自動でフェードアウトする
+          ══════════════════════════════════════ -->
+      <div
+        v-if="toastMessage"
+        class="toast"
+        :class="{ 'toast-hide': toastHiding }"
+      >{{ toastMessage }}</div>
 
 
-  <!-- ══ 画面下部の固定ボタンゾーン ══ -->
-  <div class="bottom-bar">
-    <span class="bottom-label">{{ t.groupSwitchLabel }}</span>
-    <div class="bottom-buttons">
-      <button type="button" @click="groupBy = 'none'"     :class="{ active: groupBy === 'none' }">{{ t.groupByNone }}</button>
-      <button type="button" @click="groupBy = 'category'" :class="{ active: groupBy === 'category' }">{{ t.groupByCategory }}</button>
-      <button type="button" @click="groupBy = 'dueDate'"  :class="{ active: groupBy === 'dueDate' }">{{ t.groupByDate }}</button>
-    </div>
-  </div>
+      <!-- ══════════════════════════════════════
+          下部固定エリア（表示切替ボタン）
+          入力・編集中は .hidden クラスで非表示になる
+          ══════════════════════════════════════ -->
+      <div class="bottom-bar">
+        <span class="bottom-label">{{ t.groupSwitchLabel }}</span>
+        <div class="bottom-buttons">
+          <!-- active クラスが付いているボタンが選択中（黒くなる） -->
+          <button type="button" @click="groupBy = 'none'"     :class="{ active: groupBy === 'none' }">{{ t.groupByNone }}</button>
+          <button type="button" @click="groupBy = 'category'" :class="{ active: groupBy === 'category' }">{{ t.groupByCategory }}</button>
+          <button type="button" @click="groupBy = 'dueDate'"  :class="{ active: groupBy === 'dueDate' }">{{ t.groupByDate }}</button>
+        </div>
+      </div><!-- /.bottom-bar -->
 
-</div><!-- /#app -->
+    </div><!-- /.container -->
+
+  </div><!-- /#app -->
 
 <!-- VUEを読み込む。急に動かなくならないようバージョンを固定 ══ -->
 <script src="https://unpkg.com/vue@3.5.13/dist/vue.global.js"></script>
