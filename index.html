@@ -117,10 +117,10 @@
     }
 
     /* 言語切替（左側） */
-    .lang-switch { display: flex; gap: 6px; }
+    .lang-switch { display: flex; gap: 8px; }
 
     /* 入出力ボタン（右側） */
-    .io-bar { display: flex; gap: 6px; }
+    .io-bar { display: flex; gap: 8px; }
 
     /* 言語・入出力ボタン共通スタイル */
     .lang-switch button,
@@ -129,7 +129,7 @@
       color: var(--e);
       border: 1px solid var(--e);
       padding: 3px 8px;
-      border-radius: 6px;
+      border-radius: 10px;
       font-size: 11px;
       cursor: pointer;
     }
@@ -156,7 +156,7 @@
       flex: 1;
       padding: 10px 12px;
       border: 1.5px solid var(--e);
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 15px;
       background: var(--g);
       outline: none;
@@ -172,7 +172,7 @@
     .toggle-btn {
       width: 42px;
       height: 42px;
-      border-radius: 8px;
+      border-radius: 10px;
       border: none;
       background: var(--a);
       color: var(--g);
@@ -259,7 +259,7 @@
       width: 100%;
       padding: 10px 12px;
       border: 1px solid var(--e);
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 15px;
       background: var(--b);
       outline: none;
@@ -277,7 +277,7 @@
       width: 100%;
       padding: 10px 12px;
       border: 1px solid var(--e);
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
       background: var(--b);
       outline: none;
@@ -294,7 +294,7 @@
       padding: 10px 16px;
       border: 1px solid var(--d);
       border-color: var(--e);
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 13px;
       cursor: pointer;
       color: var(--f);
@@ -303,13 +303,13 @@
     button:active { opacity: 0.7; }
 
     /* ボタンを横並びにする共通クラス */
-    .btn-row { display: flex; gap: px; } /* ボタンを均等な幅に広げる */
+    .btn-row { display: flex; 8px; gap 8px } /* ボタンを均等な幅に広げる */
     .btn-row button {
       flex: 1;                             /* ボタン内のアイコン＋テキストを横並びにする */
       display: flex;                       /* ボタン内のアイコン＋テキストを横並びにする */
       align-items: center;                 /* 上下中央に揃える */
       justify-content: center;
-      gap: 2px;                            /* アイコンとテキストの間隔 */
+      gap: 8px;                            /* アイコンとテキストの間隔 */
     }
 
     /* btn-row 内のアイコンサイズ */
@@ -319,7 +319,7 @@
 
     /* 色別ボタン */
     .cancel-btn { color: var(--e) !important; }
-    .delete-btn { color: var(--a)  !important; }
+    .delete-btn { color: var(--a) !important; }
     .copy-btn   { color: var(--d) !important; }
 
 
@@ -329,7 +329,7 @@
       color: var(--e);
       border: 1px solid var(--e);
       padding: 10px 16px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 13px;
       cursor: pointer;
       text-align: center;
@@ -359,7 +359,7 @@
     .card-row {
       display: flex;
       align-items: flex-start;
-      gap: 10px;
+      gap: 8px;
     }
 
     /* カード左側（チェックボックス＋テキスト） */
@@ -408,7 +408,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
     .todo-main-text {
@@ -435,7 +435,7 @@
       display: inline-block;
       font-size: 11px;
       padding: 2px 8px;
-      border-radius: 20px;
+      border-radius: 10px;
     }
     .tag-category { background: var(--e); color: var(--g); }
     .tag-date     { background: var(--d); color: var(--g); }
@@ -515,7 +515,7 @@
     .bottom-buttons { display: flex; gap: 6px; }
     .bottom-bar button {
       padding: 6px 14px;
-      border-radius: 20px;
+      border-radius: 10px;
       border: 1px solid var(--e);
       background: var(--g);
       color: var(--e);
@@ -540,7 +540,7 @@
       background: var(--f);
       color: #fff;
       padding: 10px 20px;
-      border-radius: 20px;
+      border-radius: 10px;
       font-size: 14px;
       white-space: nowrap;
       z-index: 1000;
