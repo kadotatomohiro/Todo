@@ -314,18 +314,21 @@
       gap: 8px;                /* ボタンの間隔 */
       justify-content: center; /* 中央寄せ */
     } 
-    .btn-row button {
-      flex: 1;                             /* ボタン内のアイコン＋テキストを横並びにする */
-      display: flex;                       /* ボタン内のアイコン＋テキストを横並びにする */
-      align-items: center;                 /* 上下中央に揃える */
-      justify-content: center;
-      gap: 8px;                            /* アイコンとテキストの間隔 */
-      max-width: 120px ;
-    }
+  .btn-row button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;   /* アイコン上・テキスト下（全ボタン共通） */
+    gap: 2px;                 /* アイコンとテキストの間隔は2px（狭めでOK） */
+    padding: 6px 4px;
+    font-size: 11px;          /* 小サイズ */
+    max-width: 120px;         /* PCで広がりすぎない */
+  }
 
     /* btn-row 内のアイコンサイズ */
     .btn-row .material-symbols-outlined {
-      font-size: 16px;
+      font-size: 20px;
     }
 
     /* 色別ボタン */
@@ -351,14 +354,18 @@
     /* =============================================
        ToDoカード
        ============================================= */
-
+    /* 期限切れてないToDoカード */
     .todo-card {
       background: var(--g);
-      border:1px solid var(--a);
+      border:1px solid var(--e);
       border-radius: 10px;
       padding: 12px 14px;
       margin-bottom: 8px;
       cursor: pointer;
+    }
+    /* 期限切れカードは枠を赤にする */
+    .todo-card.overdue {
+      border-color: var(--a); 
     }
     /* 編集中のカードは枠をつける */
     .todo-card.editing {
@@ -433,6 +440,12 @@
       color: var(--e);
     }
 
+    /* 完了済みカードは枠を薄くする（期限切れより優先される） */
+    .todo-card.done {
+      border-color: var(--e);
+      opacity: 0.4; /* 薄くして目立たせない */
+    }
+
     /* カテゴリ・期日のタグエリア */
     .todo-tags {
       font-size: 12px;
@@ -470,6 +483,38 @@
     /* 編集モードのアイコンサイズ */
     .edit-inputs .btn-row .material-symbols-outlined {
       font-size: 20px;
+    }
+
+    /* 更新ボタン：一番重要なので目立たせる */
+    .edit-inputs .btn-row button:first-child {
+      flex: 2;
+      background: var(--e);
+      color: var(--b);
+      border-color: var(--e);
+    }
+
+    /* 戻るボタン */
+    .edit-inputs .btn-row .cancel-btn {
+      flex: 1.5;
+      background: var(--g);     /* クリーム背景 */
+      color: var(--e);          /* 濃い緑文字 */
+      border-color: var(--e);   /* 枠も濃い緑 */
+    }
+
+    /* 削除ボタン */
+    .edit-inputs .btn-row .delete-btn {
+      flex: 1.5;
+      background: var(--g);     /* クリーム背景 */
+      color: var(--a);          /* 赤文字 */
+      border-color: var(--a);   /* 枠も赤 */
+    }
+
+    /* コピーボタン：補助機能なので小さめ */
+    .edit-inputs .btn-row .copy-btn {
+      flex: 1;
+      background: var(--g);     /* クリーム背景 */
+      color: var(--d);          /* 青緑文字 */
+      border-color: var(--d);   /* 枠も青緑 */
     }
 
     /* =============================================
@@ -1742,11 +1787,17 @@ app.component('todo-card', {
   },
 
   template: `
-    <div
+
+      <div
         class="todo-card"
-        :class="{ editing: editingId === todo.id }"
+        :class="{
+          editing: editingId === todo.id,      /* 編集中のときeditingクラスを付ける */
+          overdue: isOverdue(todo.dueDate),    /* 期限切れのときoverdueクラスを付ける */
+          done: todo.done                      /* 完了済みのときdoneクラスを付ける */
+        }"
         @click="editingId !== todo.id && $emit('card-click', todo)"
       >
+    
       <!-- editingId !== todo.id → 編集中でないときだけ card-click を発火する -->
       <!-- && → 左が true のときだけ右を実行する（短絡評価）-->
       <!-- つまり編集中のときは @click が何もしなくなる -->
@@ -1851,7 +1902,7 @@ app.component('todo-card', {
         <div class="btn-row">
 
           <!-- 更新ボタン：save アイコン＋テキスト -->
-          <button type="button" @click="$emit('save')">
+          <button type="button" class="save-btn" @click="$emit('save')">
             <span class="material-symbols-outlined" translate="no">save</span>
             {{ t.save }}
           </button>
