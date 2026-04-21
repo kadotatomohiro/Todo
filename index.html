@@ -23,7 +23,7 @@
   <!-- Androidの一部の端末では initial-scale=1.0 だけでは正しくスケールされないことがあるためminimumとmaximumも設定 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
   
-  <title>ToDo</title>
+  <title>QsToDo</title>
 
     <!-- PWA設定ファイルの読み込み -->
     <link rel="manifest" href="./manifest.json">
@@ -263,8 +263,11 @@
       font-size: 15px;
       background: var(--b);
       outline: none;
+      /* 縦方向だけリサイズ可能にする.iPhoneでは縦リサイズきかない。 */
       resize: vertical;
+      /* フォントをページと合わせる */
       font-family: sans-serif;
+      /* 最小の高さ */
       min-height: 44px;
       line-height: 1.5;
     }
@@ -289,23 +292,24 @@
 
     button {
       padding: 10px 16px;
-      border: none;
+      border: 1px solid var(--d);
+      border-color: var(--e);
       border-radius: 8px;
       font-size: 13px;
       cursor: pointer;
       color: var(--f);
-      background-color: var(--c);
+      background-color: var(--b);
     }
     button:active { opacity: 0.7; }
 
     /* ボタンを横並びにする共通クラス */
-    .btn-row { display: flex; gap: 8px; }
+    .btn-row { display: flex; gap: px; } /* ボタンを均等な幅に広げる */
     .btn-row button {
-      flex: 1;
-      display: flex;
-      align-items: center;
+      flex: 1;                             /* ボタン内のアイコン＋テキストを横並びにする */
+      display: flex;                       /* ボタン内のアイコン＋テキストを横並びにする */
+      align-items: center;                 /* 上下中央に揃える */
       justify-content: center;
-      gap: 4px;
+      gap: 2px;                            /* アイコンとテキストの間隔 */
     }
 
     /* btn-row 内のアイコンサイズ */
@@ -338,7 +342,7 @@
        ============================================= */
 
     .todo-card {
-      background: var(--b);
+      background: var(--g);
       border:1px solid var(--a);
       border-radius: 10px;
       padding: 12px 14px;
@@ -369,15 +373,17 @@
 
     /* カード右側（編集・削除・コピーボタン） */
     .card-right {
-      display: flex;
-      gap: 6px;
+      display: flex;  /* ← ボタンを横並びにする */
+      gap: 4px; /* ← 幅が狭くても縮まないようにする */
       flex-shrink: 0;
     }
  
     /* カード右側のボタン共通 */
     .card-right button {
       padding: 4px 6px;
+      /* アイコンと同じ行の高さに揃える */
       line-height: 1;
+      /* ボタン内のアイコンを中央揃えにする */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -390,8 +396,9 @@
     }
 
     /* カード右側のアイコンサイズ調整 */
+    /* .card-right の中の .material-symbols-outlined だけに適用する */
     .card-right .material-symbols-outlined {
-      font-size: 18px;
+      font-size: 14px;
     }
 
     /* タスクのテキスト＋タグエリア（横並び・折り返しあり） */
@@ -430,9 +437,9 @@
       padding: 2px 8px;
       border-radius: 20px;
     }
-    .tag-category { background: var(--c); color: var(--f); }
-    .tag-date     { background: var(--g); color: var(--e); }
-    .tag-date.overdue { background: var(--g); color: var(--a); }
+    .tag-category { background: var(--e); color: var(--g); }
+    .tag-date     { background: var(--d); color: var(--g); }
+    .tag-date.overdue { background: var(--a); color: var(--g); }
 
     /* 編集フォームの縦並びレイアウト */
     .edit-inputs {
@@ -443,7 +450,7 @@
 
     /* 編集モードのボタンだけアイコン上・テキスト下のレイアウトにする */
     .edit-inputs .btn-row button {
-      flex-direction: column;
+      flex-direction: column; /* アイコンとテキストを縦並びにする */
       gap: 2px;
       padding: 6px 4px;
       font-size: 10px;
@@ -486,8 +493,10 @@
     .bottom-bar {
       position: fixed;
       bottom: 0;
-      left: 0;
-      right: 0;
+      left: 50%;                      /* 左端を中央に */
+      transform: translateX(-50%);    /* 中央寄せ */
+      width: 100%;                    /* 横幅いっぱい */
+      max-width: 1000px;              /* 上部と同じ最大幅 */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -567,8 +576,6 @@
   }
   </style>
 </head>
-
-
 
 <body>
 
@@ -798,7 +805,6 @@
           入力・編集中は .hidden クラスで非表示になる
           ══════════════════════════════════════ -->
       <div class="bottom-bar">
-        <span class="bottom-label">{{ t.groupSwitchLabel }}</span>
         <div class="bottom-buttons">
           <!-- active クラスが付いているボタンが選択中（黒くなる） -->
           <button type="button" @click="groupBy = 'none'"     :class="{ active: groupBy === 'none' }">{{ t.groupByNone }}</button>
@@ -806,9 +812,6 @@
           <button type="button" @click="groupBy = 'dueDate'"  :class="{ active: groupBy === 'dueDate' }">{{ t.groupByDate }}</button>
         </div>
       </div><!-- /.bottom-bar -->
-
-      <script src="qororie-plugin.js"></script>
-
     </div><!-- /.container -->
 
   </div><!-- /#app -->
@@ -878,7 +881,6 @@ const app = createApp({
           cancel:                 '戻る',
           delete:                 '削除',
           edit:                   '編集',
-          groupSwitchLabel:       '表示切替',
           groupByNone:            '一覧',
           groupByCategory:        'カテゴリ',
           groupByDate:            '期日',
@@ -929,7 +931,6 @@ const app = createApp({
           cancel:                 'Cancel',
           delete:                 'Delete',
           edit:                   'Edit',
-          groupSwitchLabel:       'View',
           groupByNone:            'List',
           groupByCategory:        'Category',
           groupByDate:            'Due date',
@@ -1874,6 +1875,6 @@ app.component('todo-card', {
 app.mount('#app')
 
 </script>
-
+<script src="qororie-plugin.js"></script>
 </body>
 </html>

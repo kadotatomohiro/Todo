@@ -25,7 +25,11 @@
         minWait: 18000,
 
         // [7] 次に転がり始めるまでの「最長の待ち時間」（ミリ秒）
-        maxWait: 36000
+        maxWait: 36000,
+
+        // [8] PCでの下からの高さ（ピクセル）※フッターなどに重ならないよう調整
+        // スマホ（@media (max-width: 768px)は15px固定       
+        bottomOffset: 12,
     };
     // =========================================================
 
@@ -39,7 +43,7 @@
             /* 全体の枠組み：画面のいちばん手前に固定 */
             #qororie-plugin-container {
                 position: fixed;
-                bottom: ${config.margin}px;
+                bottom: ${config.bottomOffset}px;
                 left: ${config.margin}px;
                 width: ${config.iconSize}px;
                 height: ${config.iconSize}px;
