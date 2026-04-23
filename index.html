@@ -65,7 +65,7 @@
     }
 
     /* Vueが読み込まれるまで非表示にする */
-    [v-cloak] { display: none; }
+    /* [v-cloak] { display: none; } */
 
   /* =============================================
   配色
@@ -1033,8 +1033,8 @@
 
 <!-- VUEを読み込む。急に動かなくならないようバージョンを固定 ══ -->
 <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.js"></script>
-<script src="https://unpkg.com" type="text/javascript"></script>
-<script src="https://unpkg.com" crossorigin></script>
+<!-- <script src="https://unpkg.com" type="text/javascript"></script> -->
+<!-- <script src="https://unpkg.com" crossorigin></script> -->
 
 <script>
 
@@ -1522,7 +1522,7 @@ const app = createApp({
     addTodo() {
       if (!this.newTodo.trim()) return
       this.todos.push({
-        // crypto.randomUUID() → 重複しないIDを生成する（標準的なブラウザ機能）
+        crypto.randomUUID() → 重複しないIDを生成する（標準的なブラウザ機能）
         id:        crypto.randomUUID(),
         text:      this.newTodo,
         category:  this.category,
