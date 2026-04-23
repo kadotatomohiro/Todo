@@ -1031,13 +1031,15 @@
 
   </div><!-- /#app -->
 
+ 
+<script> alert('JSスタート') </script>
 <!-- VUEを読み込む。急に動かなくならないようバージョンを固定 ══ -->
 <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.js"></script>
 <!-- <script src="https://unpkg.com" type="text/javascript"></script> -->
 <!-- <script src="https://unpkg.com" crossorigin></script> -->
- <script>
+
 console.log(Vue)
-</script>
+alert('Vスタート')
 
 <script>
 
@@ -2275,6 +2277,11 @@ app.component('todo-card', {
 // アプリを「id="app"」の要素に表示する
 app.mount('#app')
 
+</script>
+
+ <script>
+  console.log(Vue);
+  alert('Vスタート');
 </script>
 <script src="qororie-plugin.js"></script>
 </body>
