@@ -1527,7 +1527,6 @@ const app = createApp({
     addTodo() {
       if (!this.newTodo.trim()) return
       this.todos.push({
-        crypto.randomUUID() → 重複しないIDを生成する（標準的なブラウザ機能）
         id:        crypto.randomUUID(),
         text:      this.newTodo,
         category:  this.category,
