@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+
   <meta charset="UTF-8">
 
   <!-- PWAのためにService Worker を登録する -->
@@ -24,6 +25,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
   
   <title>QsToDo</title>
+    <!-- ファビコン設定 -->
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
 
     <!-- PWA設定ファイルの読み込み -->
     <link rel="manifest" href="./manifest.json">
@@ -36,7 +39,9 @@
     <!-- apple-mobile-web-app-title → ホーム画面のアイコン下の名前 -->
     <meta name="apple-mobile-web-app-title" content="ToDo">
     <!-- apple-touch-icon → iOSのホーム画面アイコン -->
-    <link rel="apple-touch-icon" href="./icon-192.png">
+    <link rel="apple-touch-icon" href="./icon.png">
+
+    
       
     <!-- Material Symbols フォントの読み込み -->
     <link
@@ -53,11 +58,14 @@
       user-select: none;            /* アイコン文字が選択されないようにする */
       /* アイコンの見た目を細かく制御 */
       font-variation-settings:      
-        "FILL" 0,   /* 0 = アウトライン, 1 = 塗りつぶし */
+        "FILL" 1,   /* 0 = アウトライン, 1 = 塗りつぶし */
         "wght" 400, /* 太さ */
         "GRAD" 0,   /* グラデーション */
         "opsz" 20;  /* 最適表示サイズ */
     }
+
+    /* Vueが読み込まれるまで非表示にする */
+    [v-cloak] { display: none; }
 
   /* =============================================
   配色
@@ -65,14 +73,11 @@
   :root {
     --a: #F23A30;
     --b: #FAFAFA;
-    --c: #E4E4F5;
     --d: #56a09b;
     --e: #71752B;
     --f: #191919;
     --g: #F5F2E4;
-}
-
-
+  }
     /* =============================================
        リセット・基本設定
        ============================================= */
@@ -88,7 +93,6 @@
       padding: 0 16px 90px;  /* 上の余白だけ消す */
       font-family: sans-serif;
     }
-
 
     /* =============================================
        上部固定エリア
@@ -108,7 +112,7 @@
       z-index: 100;
     }
 
-    /* 言語切替と入出力ボタンを1行に */
+    /* 更新・言語切替と入出力ボタンを1行に */
     .top-actions {
       display: flex;
       justify-content: space-between;
@@ -116,7 +120,21 @@
       margin-bottom: 8px;
     }
 
-    /* 言語切替（左側） */
+    /* 更新・言語切替（左側） */
+
+    /* 更新ボタンのアイコンサイズ */
+    .reload-icon {
+      width: 16px;   /* ← この数字を変えてサイズ調整 */
+      height: 16px;
+      display: block;
+    }
+
+    /* ボタン自体の余白を小さくする */
+    .reload-btn {
+      padding: 2px 4px;
+    }
+
+    /* 入出力ボタンエリアの配置 */
     .lang-switch { display: flex; gap: 8px; }
 
     /* 入出力ボタン（右側） */
@@ -133,6 +151,34 @@
       font-size: 11px;
       cursor: pointer;
     }
+
+    /* 取込ボタンを囲ってるlabelをio-btnと同じ見た目にする
+    　（ファイル選択画面がブラウザセキュリティで出ないことがある対応としてlabel導入） */
+    .io-import-label {
+      cursor: pointer;
+    }
+
+    /* 上部バーボタン スマホ（400px以下）のときだけボタンを小さくする */
+    @media (max-width: 400px) {
+      .lang-switch button,
+      .io-btn,
+      .io-import-label {
+        padding: 3px 4px;       /* 左右の余白を最小限に */
+        font-size: 10px;        /* 文字も少し小さく */
+      }
+
+      /* アイコンサイズも少し小さくする */
+      .lang-switch .material-symbols-outlined,
+      .io-bar .material-symbols-outlined {
+        font-size: 16px;        /* 20px → 16px */
+      }
+
+      /* ボタン間隔も詰める */
+      .lang-switch { gap: 4px; }
+      .io-bar { gap: 4px; }
+    }
+
+    /* 言語バーホバー時 */
     .lang-switch button:hover,
     .io-btn:hover { color: var(--f); border-color: var(--f); }
 
@@ -231,8 +277,8 @@
       background: (--g);
       border: 1px solid var(--e);
       border-top: none;
-      border-bottom-left-radius: 8px;
-      border-bottom-right-radius: 8px;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
       overflow: hidden;
       margin-bottom: 4px;
     }
@@ -314,17 +360,17 @@
       gap: 8px;                /* ボタンの間隔 */
       justify-content: center; /* 中央寄せ */
     } 
-  .btn-row button {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;   /* アイコン上・テキスト下（全ボタン共通） */
-    gap: 2px;                 /* アイコンとテキストの間隔は2px（狭めでOK） */
-    padding: 6px 4px;
-    font-size: 11px;          /* 小サイズ */
-    max-width: 120px;         /* PCで広がりすぎない */
-  }
+    .btn-row button {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;   /* アイコン上・テキスト下（全ボタン共通） */
+      gap: 2px;                 /* アイコンとテキストの間隔は2px（狭めでOK） */
+      padding: 6px 4px;
+      font-size: 11px;          /* 小サイズ */
+      max-width: 120px;         /* PCで広がりすぎない */
+    }
 
     /* btn-row 内のアイコンサイズ */
     .btn-row .material-symbols-outlined {
@@ -336,20 +382,21 @@
     .delete-btn { color: var(--a) !important; }
     .copy-btn   { color: var(--d) !important; }
 
-
-    /* 追加フォームのキャンセルボタン */
-    .cancel-add-btn {
-      background: transparent;
-      color: var(--e);
-      border: 1px solid var(--e);
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-size: 13px;
-      cursor: pointer;
-      text-align: center;
-      flex: 1;
+    /* 追加ボタン：一番重要なので目立たせる */
+    .add-btn {
+      flex: 2;                  /* 戻るボタンの2倍の幅 */
+      background: var(--e);     /* 濃い緑背景 */
+      color: var(--b);          /* 白文字 */
+      border-color: var(--e);   /* 枠も濃い緑 */
     }
 
+    /* 追加フォームの戻るボタン */
+    .cancel-add-btn {
+      flex: 1;                  /* 普通サイズ */
+      background: var(--g);     /* クリーム背景 */
+      color: var(--e);          /* 濃い緑文字 */
+      border-color: var(--e);   /* 枠も濃い緑 */
+    }
 
     /* =============================================
        ToDoカード
@@ -366,6 +413,11 @@
     /* 期限切れカードは枠を赤にする */
     .todo-card.overdue {
       border-color: var(--a); 
+    }
+    /* 完了済みカードは枠を薄くする（期限切れより優先される） */
+    .todo-card.done {
+      border-color: var(--e);
+      opacity: 0.4; /* 薄くして目立たせない */
     }
     /* 編集中のカードは枠をつける */
     .todo-card.editing {
@@ -429,21 +481,25 @@
       gap: 8px;
     }
 
+    /* タスクの標準文字装飾 */
     .todo-main-text {
       font-size: 15px;
       color: var(--f);
       word-break: break-word;
       line-height: 1.4;
     }
+     /* 完了タスクの標準文字装飾 */
     .todo-main-text.done {
       text-decoration: line-through;
       color: var(--e);
     }
-
-    /* 完了済みカードは枠を薄くする（期限切れより優先される） */
-    .todo-card.done {
-      border-color: var(--e);
-      opacity: 0.4; /* 薄くして目立たせない */
+    /* 期限切れのカードのテキストの文字色 */
+    .todo-card.overdue .todo-main-text {
+      color: var(--a);
+    }
+    /* 期限切れ＋完了済みは完了の文字色 */
+    .todo-card.overdue.done .todo-main-text {
+      color: var(--e);
     }
 
     /* カテゴリ・期日のタグエリア */
@@ -465,7 +521,11 @@
     .tag-date     { background: var(--d); color: var(--g); }
     .tag-date.overdue { background: var(--a); color: var(--g); }
 
-    /* 編集フォームの縦並びレイアウト */
+    /* =============================================
+    　　編集モード
+    ============================================= */
+
+    /* 編集モードの縦並びレイアウト */
     .edit-inputs {
       display: flex;
       flex-direction: column;
@@ -474,7 +534,7 @@
 
     /* 編集モードのボタンだけアイコン上・テキスト下のレイアウトにする */
     .edit-inputs .btn-row button {
-      flex-direction: column; /* アイコンとテキストを縦並びにする */
+      flex-direction: column;
       gap: 2px;
       padding: 6px 4px;
       font-size: 10px;
@@ -483,6 +543,40 @@
     /* 編集モードのアイコンサイズ */
     .edit-inputs .btn-row .material-symbols-outlined {
       font-size: 20px;
+    }
+
+    /* 編集モードのチェックボックス行 */
+    .edit-check-row {
+        display: flex;            /* 横並び */
+        align-items: center;      /* 上下中央に揃える */
+        gap: 8px;                 /* チェックボックスとテキストの間隔 */
+        padding: 4px 0;           /* 上下に少し余白 */
+    }
+
+    .edit-check-label {
+      font-size: 13px;          /* 中サイズ */
+      color: var(--e);          /* 濃い緑 */
+    }
+
+    /* 編集モードの入力欄ラベル行（アイコン＋入力欄を横並び） */
+    .edit-label-row {
+      display: flex;            /* 横並び */
+      align-items: center;      /* 上下中央に揃える */
+      gap: 8px;                 /* アイコンと入力欄の間隔 */
+    }
+
+    /* 編集モードのラベルアイコン */
+    .edit-label-row .material-symbols-outlined {
+      font-size: 18px;          /* 少し小さめ */
+      color: var(--e);          /* 濃い緑 */
+      flex-shrink: 0;           /* アイコンが縮まないようにする */
+    }
+
+    /* 編集モードの入力欄をラベル行の中で横いっぱいに広げる */
+    .edit-label-row input,
+    .edit-label-row textarea {
+      flex: 1;                  /* 残りの幅をすべて使う */
+      width: auto;              /* flexで広げるのでwidthはautoに */
     }
 
     /* 更新ボタン：一番重要なので目立たせる */
@@ -515,6 +609,21 @@
       background: var(--g);     /* クリーム背景 */
       color: var(--d);          /* 青緑文字 */
       border-color: var(--d);   /* 枠も青緑 */
+    }
+
+    /* =============================================
+       カード追加・削除のフェードアニメーション(VUEの機能で実装)
+    ============================================= */
+
+    .todo-fade-enter-active {
+      transition: opacity 0.3s; /* 追加時：0.3秒でふわっと出る */
+    }
+    .todo-fade-leave-active {
+      transition: opacity 0.3s; /* 削除時：0.3秒でふわっと消える */
+    }
+    .todo-fade-enter-from,
+    .todo-fade-leave-to {
+      opacity: 0; /* 開始・終了時は透明 */
     }
 
     /* =============================================
@@ -583,6 +692,21 @@
       border-color: var(--a);
     }
 
+    /* 450px以下：テキストのみ・アイコンを非表示 */
+    @media (max-width: 450px) {
+      .bottom-bar button {
+        font-size: 10px;          /* 少し小さめ */
+        padding: 6px 8px;         /* 余白を詰める */
+        flex-direction: row;      /* アイコン上・テキスト下 → 横並びに戻す */
+      }
+      /* アイコンを非表示にする */
+      .bottom-bar .material-symbols-outlined {
+        display: none;
+      }
+      .bottom-bar {
+        padding: 10px 50px 16px;
+      }
+    }
 
     /* =============================================
        トースト通知
@@ -632,7 +756,6 @@
   }
   </style>
 </head>
-
 <body>
 
   <!-- 横向きのときに表示するメッセージ（#appの外に置く） -->
@@ -653,7 +776,7 @@
         　├── .toast（トースト通知）
         　└── .bottom-bar（下部固定）
   ══════════════════════════════════════ -->
-  <div id="app">
+  <div id="app" v-cloak>
 
     <!-- ↓ padding-top をVueで動的に変える（ヘッダーの高さ + 余白12px）-->
     <div class="container" :style="{ paddingTop: (topHeight + 12) + 'px' }">
@@ -666,26 +789,38 @@
         <!-- 言語切替（左）・入出力ボタン（右）を1行に -->
         <div class="top-actions">
 
-          <!-- 言語切替ボタン -->
+          <!-- 言語切替･更新(キャッシュ)ボタン -->
           <div class="lang-switch">
+            <button type="button" class="io-btn" @click="reloadApp">
+              <img src="./icon.svg" alt="更新" class="reload-icon">
+            </button>
             <button type="button" @click="currentLang = 'ja'" :class="{ active: currentLang === 'ja' }">ja</button>
             <button type="button" @click="currentLang = 'en'" :class="{ active: currentLang === 'en' }">en</button>
           </div>
 
           <!-- CSV・JSON出力・取込ボタン -->
           <div class="io-bar">
-            <button type="button" class="io-btn" @click="exportCSV">CSV</button>
-            <button type="button" class="io-btn" @click="exportJSON">JSON</button>
-            <button type="button" class="io-btn" @click="triggerImport">{{ t.importFile }}</button>
-            <!-- ファイル選択は非表示のinputで処理する -->
-            <!-- accept → 選べるファイルの種類を制限する -->
-            <input
-              type="file"
-              ref="importFile"
-              accept=".csv,.json"
-              style="display:none"
-              @change="importFile"
-            >
+            <button type="button" class="io-btn" @click="exportCSV">
+              <span class="material-symbols-outlined" translate="no">csv</span>
+            </button>
+            <button type="button" class="io-btn" @click="exportJSON">
+              <span class="material-symbols-outlined" translate="no">file_json</span>
+            </button>
+            <!-- ？ボタン：フォーマット説明を表示するだけ -->
+            <button type="button" class="io-btn" @click="showImportInfo">
+              <span class="material-symbols-outlined" translate="no">help</span>
+            </button>
+            <!-- 出力ボタン labelでinputを包む → クリックが直接inputに伝わる -->
+            <label class="io-btn io-import-label">
+              <span class="material-symbols-outlined" translate="no">download</span>
+              <input
+                type="file"
+                ref="importFile"
+                accept=".csv,.json"
+                style="display:none"
+                @change="importFile"
+              >
+            </label>          <!-- 取込ボタン：直接ファイル選択を開く -->
           </div>
 
         </div><!-- /.top-actions -->
@@ -714,8 +849,7 @@
           {{ filteredTodos.length }}{{ t.statusOf }}{{ todos.length }}{{ t.statusItems }}
         </div>
 
-      </div><!-- /.top-fixed -->
-
+      </div><!-- /.top-fixed 
 
       <!-- ══════════════════════════════════════
           タスク追加フォーム
@@ -723,28 +857,34 @@
           ══════════════════════════════════════ -->
       <div v-if="showInput" class="input-area">
 
-        <!-- タスク入力欄（最大120文字） -->
-        <textarea
-          v-model="newTodo"
-          :placeholder="t.placeholderTodo"
-          maxlength="120"
-          rows="1"
-          @input="newTodo = newTodo.slice(0, 120)"
-          @focus="cancelEditIfNeeded"
-          class="todo-textarea"
-        ></textarea>
+        <!-- タスク入力欄：アイコンラベル付き（最大120文字） -->
+        <div class="edit-label-row">
+          <span class="material-symbols-outlined" translate="no">edit_note</span>
+          <textarea
+            v-model="newTodo"
+            :placeholder="t.placeholderTodo"
+            maxlength="120"
+            rows="1"
+            @input="newTodo = newTodo.slice(0, 120)"
+            @focus="cancelEditIfNeeded"
+            class="todo-textarea"
+          ></textarea>
+        </div>
 
-        <!-- カテゴリ入力欄（最大20文字） -->
+        <!-- カテゴリ入力欄：アイコンラベル付き（最大20文字） -->
         <!-- フォーカス中かつ候補があるとき青枠で候補リストと一体化する -->
-        <input
-          v-model="category"
-          :placeholder="t.placeholderCategory"
-          maxlength="20"
-          :class="{ 'category-input-active': categoryFocused && filteredCategories.length > 0 }"
-          @input="category = category.slice(0, 20)"
-          @focus="categoryFocused = true; cancelEditIfNeeded()"
-          @blur="setTimeout(() => { categoryFocused = false }, 200)"
-        >
+        <div class="edit-label-row">
+          <span class="material-symbols-outlined" translate="no">label</span>
+          <input
+            v-model="category"
+            :placeholder="t.placeholderCategory"
+            maxlength="20"
+            :class="{ 'category-input-active': categoryFocused && filteredCategories.length > 0 }"
+            @input="category = category.slice(0, 20)"
+            @focus="categoryFocused = true; cancelEditIfNeeded()"
+            @blur="setTimeout(() => { categoryFocused = false }, 200)"
+          >
+        </div>
 
         <!-- カテゴリ候補リスト：フォーカス中かつ候補があるときだけ表示 -->
         <template v-if="categoryFocused && filteredCategories.length > 0">
@@ -759,15 +899,28 @@
           </div>
         </template>
 
-        <!-- 期日入力欄 -->
-        <div class="date-row">
-          <span class="date-label">{{ t.datePlaceholder }}</span>
+        <!-- カテゴリ候補リスト：フォーカス中かつ候補があるときだけ表示 -->
+        <template v-if="categoryFocused && filteredCategories.length > 0">
+          <div class="category-dropdown-label">{{ t.categorySuggestions }}</div>
+          <div class="category-dropdown">
+            <div
+              v-for="cat in filteredCategories"
+              :key="cat"
+              class="category-option"
+              @click="selectCategory(cat)"
+            >▸ {{ cat }}</div>
+          </div>
+        </template>
+
+        <!-- 期日入力欄：アイコンラベル付き -->
+        <div class="edit-label-row">
+          <span class="material-symbols-outlined" translate="no">calendar_today</span>
           <input type="date" v-model="dueDate">
         </div>
 
         <!-- 追加・キャンセルボタン（横並び） -->
         <div class="btn-row">
-          <button type="button" @click="addTodo">
+          <button type="button" class="add-btn" @click="addTodo">
             <span class="material-symbols-outlined" translate="no">add_circle</span>
             {{ t.add }}
           </button>
@@ -788,6 +941,8 @@
       <!-- 一覧モード（groupBy === 'none' のとき） -->
       <!-- sortedTodos：新しい順に並べたタスク一覧（computedで計算済み） -->
       <div v-if="groupBy === 'none'">
+        <!-- transition-group → v-forのリストにアニメーションをつける -->
+        <transition-group name="todo-fade" tag="div">
         <todo-card
           v-for="todo in sortedTodos"
           :key="todo.id"
@@ -844,7 +999,6 @@
         </div>
       </div><!-- /グループモード -->
 
-
       <!-- ══════════════════════════════════════
           トースト通知
           toastMessage があるときだけ表示・自動でフェードアウトする
@@ -861,19 +1015,27 @@
           入力・編集中は .hidden クラスで非表示になる
           ══════════════════════════════════════ -->
       <div class="bottom-bar">
-        <div class="bottom-buttons">
-          <!-- active クラスが付いているボタンが選択中（黒くなる） -->
-          <button type="button" @click="groupBy = 'none'"     :class="{ active: groupBy === 'none' }">{{ t.groupByNone }}</button>
-          <button type="button" @click="groupBy = 'category'" :class="{ active: groupBy === 'category' }">{{ t.groupByCategory }}</button>
-          <button type="button" @click="groupBy = 'dueDate'"  :class="{ active: groupBy === 'dueDate' }">{{ t.groupByDate }}</button>
-        </div>
-      </div><!-- /.bottom-bar -->
+        <button type="button" @click="groupBy = 'none'" :class="{ active: groupBy === 'none' }">
+          <span class="material-symbols-outlined" translate="no">view_list</span>
+          {{ t.groupByNone }}
+        </button>
+        <button type="button" @click="groupBy = 'category'" :class="{ active: groupBy === 'category' }">
+          <span class="material-symbols-outlined" translate="no">label</span>
+          {{ t.groupByCategory }}
+        </button>
+        <button type="button" @click="groupBy = 'dueDate'" :class="{ active: groupBy === 'dueDate' }">
+          <span class="material-symbols-outlined" translate="no">calendar_today</span>
+          {{ t.groupByDate }}
+        </button>  
     </div><!-- /.container -->
 
   </div><!-- /#app -->
 
 <!-- VUEを読み込む。急に動かなくならないようバージョンを固定 ══ -->
-<script src="https://unpkg.com/vue@3.5.13/dist/vue.global.js"></script>
+<script src="https://unpkg.com/vue@3.2.47/dist/vue.global.js"></script>
+<script src="https://unpkg.com" type="text/javascript"></script>
+<script src="https://unpkg.com" crossorigin></script>
+
 <script>
 
 // VueからcreateAppを取り出す
@@ -912,12 +1074,120 @@ function parseCSVLine(line) {
   return result
 }
 
+// =============================================
+// 様々な日付形式を yyyy-mm-dd に統一する関数
+// 対応形式：
+//   yyyy-mm-dd（元の形式）
+//   yyyy/m/d, yyyy/mm/dd
+//   m/d/yyyy（英語Excel）
+//   yyyy年m月d日
+// =============================================    
+function normalizeDate(str) {
+  if (!str || !str.trim()) return ''
+  const s = str.trim()
+
+  // すでに yyyy-mm-dd 形式ならそのまま返す
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
+
+  let y, m, d
+
+  // yyyy/m/d または yyyy/mm/dd
+  const slashYMD = s.split('/')
+  if (slashYMD.length === 3 && slashYMD[0].length === 4) {
+    y = parseInt(slashYMD[0])
+    m = parseInt(slashYMD[1])
+    d = parseInt(slashYMD[2])
+  }
+
+  // m/d/yyyy（英語Excel形式）
+  else if (slashYMD.length === 3 && slashYMD[2].length === 4) {
+    m = parseInt(slashYMD[0])
+    d = parseInt(slashYMD[1])
+    y = parseInt(slashYMD[2])
+  }
+
+  // yyyy年m月d日
+  else {
+    const kanji = s.replace('年', '/').replace('月', '/').replace('日', '').split('/')
+    if (kanji.length === 3 && kanji[0].length === 4) {
+      y = parseInt(kanji[0])
+      m = parseInt(kanji[1])
+      d = parseInt(kanji[2])
+    }
+  }
+
+  // 年月日が取れなかったら空文字を返す
+  if (!y || !m || !d) return ''
+
+  // 日付として有効かチェック（例：2月30日などを弾く）
+  const date = new Date(y, m - 1, d)
+  if (
+    date.getFullYear() !== y ||
+    date.getMonth() + 1 !== m ||
+    date.getDate() !== d
+  ) return ''
+
+  // yyyy-mm-dd 形式に整える（月・日を2桁にする）
+  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+} 
 
 // =============================================
-// Vueアプリ本体
-// createApp → アプリを作る
-// app変数に入れる → 後でコンポーネントを登録するため
-// =============================================
+// 様々な日付形式を yyyy-mm-dd に統一する関数
+// 対応形式：
+//   yyyy-mm-dd（元の形式）
+//   yyyy/m/d, yyyy/mm/dd
+//   m/d/yyyy（英語Excel）
+//   yyyy年m月d日
+// =============================================    
+function normalizeDate(str) {
+  if (!str || !str.trim()) return ''
+  const s = str.trim()
+
+  // すでに yyyy-mm-dd 形式ならそのまま返す
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
+
+  let y, m, d
+
+  // yyyy/m/d または yyyy/mm/dd
+  const slashYMD = s.split('/')
+  if (slashYMD.length === 3 && slashYMD[0].length === 4) {
+    y = parseInt(slashYMD[0])
+    m = parseInt(slashYMD[1])
+    d = parseInt(slashYMD[2])
+  }
+
+  // m/d/yyyy（英語Excel形式）
+  else if (slashYMD.length === 3 && slashYMD[2].length === 4) {
+    m = parseInt(slashYMD[0])
+    d = parseInt(slashYMD[1])
+    y = parseInt(slashYMD[2])
+  }
+
+  // yyyy年m月d日
+  else {
+    const kanji = s.replace('年', '/').replace('月', '/').replace('日', '').split('/')
+    if (kanji.length === 3 && kanji[0].length === 4) {
+      y = parseInt(kanji[0])
+      m = parseInt(kanji[1])
+      d = parseInt(kanji[2])
+    }
+  }
+
+  // 年月日が取れなかったら空文字を返す
+  if (!y || !m || !d) return ''
+
+  // 日付として有効かチェック（例：2月30日などを弾く）
+  const date = new Date(y, m - 1, d)
+  if (
+    date.getFullYear() !== y ||
+    date.getMonth() + 1 !== m ||
+    date.getDate() !== d
+  ) return ''
+
+  // yyyy-mm-dd 形式に整える（月・日を2桁にする）
+  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+} 
+
 const app = createApp({
 
   // ── データ（アプリが持つ変数） ──
@@ -940,6 +1210,8 @@ const app = createApp({
           groupByNone:            '一覧',
           groupByCategory:        'カテゴリ',
           groupByDate:            '期日',
+          done:                   '完了', 
+          notDone:                '未完了', 
           noCategory:             '未分類',
           noDate:                 '期日なし',
           statusOf:               '件を表示中 (全',
@@ -952,7 +1224,7 @@ const app = createApp({
           importFile:             '取込',
           // トーストで使用。{name} の部分がタスク名に置き換わる
           toastAdded:             '「{name}」を追加しました',
-          toastUpdated:           '「{name}」に更新しました',
+          toastUpdated:           '「{name}」を更新しました',
           toastDeleted:           '「{name}」を削除しました',
           toastExported:          'エクスポートしました',
           // トーストで使用。{count} の部分が件数に置き換わる
@@ -990,6 +1262,8 @@ const app = createApp({
           groupByNone:            'List',
           groupByCategory:        'Category',
           groupByDate:            'Due date',
+          done:                   'Done', 
+          notDone:                'Not done',
           noCategory:             'Uncategorized',
           noDate:                 'No due date',
           statusOf:               ' shown (total ',
@@ -1067,7 +1341,6 @@ const app = createApp({
       toastHiding: false,
     }
   },
-
 
   // ── 算出プロパティ（dataを加工して返す。依存データが変わると自動再計算） ──
   computed: {
@@ -1195,7 +1468,6 @@ const app = createApp({
       return []
     }
   },
-
 
   // ── メソッド（ボタンを押したときなどの処理） ──
   methods: {
@@ -1511,8 +1783,8 @@ const app = createApp({
       })
       // \uFEFF → BOM（ExcelでCSVを開くときの文字化けを防ぐ）
       const csv = '\uFEFF' + rows.join('\n')
-      this.downloadFile(csv, 'todos.csv', 'text/csv;charset=utf-8')
-      this.showToast(this.t.toastExported)
+      this.downloadFile(csv, `todos-${this.getDateStamp()}.csv`, 'text/csv;charset=utf-8')
+      this.showToast(this.t.toastExported)    
     },
 
     // JSONエクスポート
@@ -1524,19 +1796,13 @@ const app = createApp({
 
       // JSON.stringify(データ, null, 2) → インデント付きのJSON文字列に変換
       const json = JSON.stringify(this.todos, null, 2)
-      this.downloadFile(json, 'todos.json', 'application/json')
+      this.downloadFile(json, `todos-${this.getDateStamp()}.json`, 'application/json')
       this.showToast(this.t.toastExported)
     },
 
-    // ファイル選択ボタンをクリックする
-    // input type="file" は直接クリックできないので
-    // ref="importFile" で参照してプログラムからクリックする
-    triggerImport() {
-      // ファイル選択前にフォーマット説明を表示
-      // confirm → OK なら選択に進む、キャンセルなら中止
-      const proceed = confirm(this.t.importFormatInfo)
-      if (!proceed) return
-      this.$refs.importFile.click()
+    // ？ボタン：フォーマット説明をalertで表示するだけ
+    showImportInfo() {
+      alert(this.t.importFormatInfo)
     },
 
     // ファイルが選択されたとき
@@ -1551,28 +1817,49 @@ const app = createApp({
         return
       }
 
-      // FileReader → ファイルの中身をテキストとして読み込む道具
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const content = e.target.result
-        try {
-          if (file.name.endsWith('.json')) {
-            this.importFromJSON(content)
-          } else if (file.name.endsWith('.csv')) {
-            this.importFromCSV(content)
+      // JSONはUTF-8固定で読み込む
+      if (file.name.endsWith('.json')) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          try {
+            this.importFromJSON(e.target.result)
+          } catch (err) {
+            this.showToast(this.t.toastImportError)
+            console.log('取込エラー:', err)
           }
-        } catch (err) {
-          this.showToast(this.t.toastImportError)
-          console.log('取込エラー:', err)
+          event.target.value = ''
         }
-        // 同じファイルを再度選択できるようにリセット
-        event.target.value = ''
+        reader.readAsText(file, 'UTF-8')
+        return
       }
-      // テキストとして読み込む（UTF-8）
-      reader.readAsText(file, 'UTF-8')
+
+      // CSVはまずバイナリで読んで文字コードを判定する
+      const sniffer = new FileReader()
+      sniffer.onload = (e) => {
+        const bytes = new Uint8Array(e.target.result)
+
+        // BOM付きUTF-8チェック（先頭3バイトが EF BB BF）
+        const isUtf8Bom = bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF
+
+        // BOM付きUTF-8ならUTF-8、そうでなければShift-JISで読む
+        const encoding = isUtf8Bom ? 'UTF-8' : 'Shift-JIS'
+
+        const reader = new FileReader()
+        reader.onload = (e2) => {
+          try {
+            this.importFromCSV(e2.target.result)
+          } catch (err) {
+            this.showToast(this.t.toastImportError)
+            console.log('取込エラー:', err)
+          }
+          event.target.value = ''
+        }
+        reader.readAsText(file, encoding)
+      }
+      sniffer.readAsArrayBuffer(file)
     },
 
-    // JSONから取り込む
+  // JSONから取り込む
     importFromJSON(content) {
       const raw = JSON.parse(content)
       if (!Array.isArray(raw)) throw new Error('配列ではありません')
@@ -1585,9 +1872,8 @@ const app = createApp({
           // カテゴリ：20文字で切る
           const category = (item.category || '').slice(0, 20)
 
-          // 期日：yyyy-mm-dd形式チェック
-          const rawDate = item.dueDate || ''
-          const dueDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : ''
+          // 期日：normalizeDate → いろんな形式を yyyy-mm-dd に統一してくれる
+          const dueDate = normalizeDate(item.dueDate || '')
 
           // 完了：true のみtrue、それ以外はfalse
           const done = item.done === true
@@ -1624,7 +1910,9 @@ const app = createApp({
 
           // 期日：yyyy-mm-dd形式チェック
           const rawDate = cols[2] || ''
-          const dueDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : ''
+
+          // normalizeDate → いろんな形式を yyyy-mm-dd に統一してくれる
+          const dueDate = normalizeDate(cols[2] || '')
 
           // 完了：'true' のみtrue、それ以外はfalse
           const done = cols[3] === 'true'
@@ -1645,7 +1933,7 @@ const app = createApp({
 
       this.applyImport(data)
     },
-
+    
     // 取り込んだデータをtodosに反映する（上書きか追加かを選ぶ）
     applyImport(data) {
       // 1回目：上書きモードで取り込むか？
@@ -1666,37 +1954,68 @@ const app = createApp({
       // どちらもキャンセル → 取込をやめる
       this.showToast(this.t.toastImportCancelled)
     },
-  },
 
-
-    // ── ウォッチャー（データの変化を監視する） ──
-    watch: {
-      // todosが変わったら自動でlocalStorageに保存する
-      // deep: true → 配列の中身の変化も検知する
-      todos: {
-        deep: true,
-        handler() {
-          try {
-            // タスクをJSON文字列に変換してlocalStorageに保存する
-            localStorage.setItem('todos', JSON.stringify(this.todos))
-          } catch (e) {
-            // プライベートブラウジングや容量オーバーのときはここに来る
-            // アプリはそのまま動かし続ける（クラッシュさせない）
-            // コンソールとトーストで通知
-            console.log(this.t.saveError, e)
-            this.showToast(this.t.saveError)
+    // アプリを強制的に最新版に更新する
+    reloadApp() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(reg => {
+          if (reg) {
+            // Service Workerに新しいバージョンがあれば適用する
+            reg.update().then(() => {
+              window.location.reload()
+            })
+          } else {
+            window.location.reload()
           }
+        })
+      } else {
+        window.location.reload()
+      }
+    },
+
+    // 現在日時を "mmddHHMM" 形式で返す
+    getDateStamp() {
+    const now = new Date()
+    const mm = String(now.getMonth() + 1).padStart(2, '0')  // 月
+    const dd = String(now.getDate()).padStart(2, '0')       // 日
+    const HH = String(now.getHours()).padStart(2, '0')      // 時
+    const MM = String(now.getMinutes()).padStart(2, '0')    // 分
+    return `${mm}${dd}${HH}${MM}`
+  },
+ 
+  },
+  
+  // ── ウォッチャー（データの変化を監視する） ──
+  watch: {
+
+    // todosが変わったら自動でlocalStorageに保存する
+    // deep: true → 配列の中身の変化も検知する
+    todos: {
+      deep: true,
+      handler() {
+        try {
+          // タスクをJSON文字列に変換してlocalStorageに保存する
+          localStorage.setItem('todos', JSON.stringify(this.todos))
+        } catch (e) {
+          // プライベートブラウジングや容量オーバーのときはここに来る
+          // アプリはそのまま動かし続ける（クラッシュさせない）
+          // コンソールとトーストで通知
+          console.log(this.t.saveError, e)
+          this.showToast(this.t.saveError)
         }
-      },  
+      }
+    },  
 
     // グループ表示が切り替わったとき
     groupBy(newVal) {
       if (newVal === 'none') {
         this.openGroups = []
       } else {
-        // 全グループを開いた状態にする
-        this.openGroups = this.groupedTodos.map(g => g.label)
+        // 全グループを開いた状態にする（現在はコメントアウトで封印し閉じたVer）
+        // this.openGroups = this.groupedTodos.map(g => g.label)// 
       }
+      // ← 表示切替のたびに一番上にスクロールする
+    window.scrollTo({ top: 0, behavior: 'smooth' })
     },
 
     // フォームの開閉で上部の高さが変わるので測り直す
@@ -1705,7 +2024,6 @@ const app = createApp({
       this.$nextTick(() => { this.updateTopHeight() })
     }, 
   },
-
 
   // ── マウント（ページが読み込まれたとき1回だけ実行される） ──
   mounted() {
@@ -1732,7 +2050,6 @@ const app = createApp({
 
     // ページ読み込み時に高さを測る
     this.$nextTick(() => {
-      this.openGroups = this.groupedTodos.map(g => g.label)
       this.updateTopHeight()
     }) 
 
@@ -1774,16 +2091,18 @@ app.component('todo-card', {
   },
 
   methods: {
-    // 期日が今日より前かどうか判定する（期限切れ → タグを赤くする）
-    isOverdue(dateStr) {
-      if (!dateStr) return false
-      const [y, m, d] = dateStr.split('-').map(Number)
-      const due = new Date(y, m - 1, d)
-      due.setHours(0, 0, 0, 0)
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      return due < today
-    }
+  // 期日が今日より前かどうか判定する（期限切れ → タグを赤くする）
+  isOverdue(dateStr) {
+    if (!dateStr) return false
+    const [y, m, d] = dateStr.split('-').map(Number)
+    const due = new Date(y, m - 1, d)
+    due.setHours(0, 0, 0, 0)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return due < today
+  },
+
+
   },
 
   template: `
@@ -1856,28 +2175,46 @@ app.component('todo-card', {
       <!-- 編集モード（編集中のとき） -->
       <div v-else class="edit-inputs" @click.stop>
 
-        <!-- タスク入力欄 最大文字数120-->
-        <!-- todo.text.slice(0, 120) WinIMEコンポジションバグ対策 120文字制限が聞かない時用の対策-->
-        <textarea
-          v-model="todo.text"
-          :placeholder="t.placeholderTodo"
-          maxlength="120"
-          rows="1"
-          @input="todo.text = todo.text.slice(0, 120)"
-          class="todo-textarea"
-        ></textarea>
+        <!-- @change → チェックが変わったとき保存して編集モードを閉じる -->
+          <div class="edit-check-row">
+            <input
+            type="checkbox"
+            class="cb"
+            v-model="todo.done"
+            @change="$emit('save')"
+            @click.stop
+            >
+              <span class="edit-check-label">{{ todo.done ? t.done : t.notDone }}</span>
+          </div>
 
-        <!-- カテゴリ入力欄：フォーカス中かつ候補があるとき青枠で一体化 最大文字数20-->
+        <!-- タスク入力欄：アイコンラベル付き 最大文字数120-->
+        <!-- todo.text.slice(0, 120) WinIMEコンポジションバグ対策 120文字制限が聞かない時用の対策-->
+        <div class="edit-label-row">
+          <span class="material-symbols-outlined" translate="no">edit_note</span>
+          <textarea
+            v-model="todo.text"
+            :placeholder="t.placeholderTodo"
+            maxlength="120"
+            rows="1"
+            @input="todo.text = todo.text.slice(0, 120)"
+            class="todo-textarea"
+          ></textarea>
+        </div>
+        
+        <!-- カテゴリ入力欄：アイコンラベル付き：フォーカス中かつ候補があるとき青枠で一体化 最大文字数20-->
         <!-- todo.category.slice(0, 20) WinIMEコンポジションバグ対策 20文字制限が聞かない時用の対策-->
-        <input
-          v-model="todo.category"
-          :placeholder="t.placeholderCategory"
-          maxlength="20"
-          :class="{ 'category-input-active': categoryFocused && filteredCategoriesEdit && filteredCategoriesEdit.length > 0 }"
-          @input="todo.category = todo.category.slice(0, 20)"
-          @focus="categoryFocused = true"
-          @blur="setTimeout(() => { categoryFocused = false }, 200)"
-        >
+        <div class="edit-label-row">
+          <span class="material-symbols-outlined" translate="no">label</span>
+          <input
+            v-model="todo.category"
+            :placeholder="t.placeholderCategory"
+            maxlength="20"
+            :class="{ 'category-input-active': categoryFocused && filteredCategoriesEdit && filteredCategoriesEdit.length > 0 }"
+            @input="todo.category = todo.category.slice(0, 20)"
+            @focus="categoryFocused = true"
+            @blur="setTimeout(() => { categoryFocused = false }, 200)"
+          >
+        </div>
 
         <!-- カテゴリ候補：フォーカス中かつ候補があるときだけ表示 -->
         <template v-if="categoryFocused && filteredCategoriesEdit && filteredCategoriesEdit.length > 0">
@@ -1892,9 +2229,9 @@ app.component('todo-card', {
           </div>
         </template>
 
-        <!-- 期日入力欄 -->
-        <div class="date-row">
-          <span class="date-label">{{ t.datePlaceholder }}</span>
+        <!-- 期日入力欄：アイコンラベル付き -->
+        <div class="edit-label-row">
+          <span class="material-symbols-outlined" translate="no">calendar_today</span>
           <input type="date" v-model="todo.dueDate">
         </div>
 
@@ -1931,7 +2268,6 @@ app.component('todo-card', {
     </div>
   `
 }) // todo-card ここまで
-
 
 // アプリを「id="app"」の要素に表示する
 app.mount('#app')
