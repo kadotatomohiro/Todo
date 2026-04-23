@@ -41,7 +41,6 @@
     <!-- apple-touch-icon → iOSのホーム画面アイコン -->
     <link rel="apple-touch-icon" href="./icon.png">
 
-    
       
     <!-- Material Symbols フォントの読み込み -->
     <link
@@ -1031,15 +1030,8 @@
 
   </div><!-- /#app -->
 
- 
-<script> alert('JSスタート') </script>
 <!-- VUEを読み込む。急に動かなくならないようバージョンを固定 ══ -->
 <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.js"></script>
-<!-- <script src="https://unpkg.com" type="text/javascript"></script> -->
-<!-- <script src="https://unpkg.com" crossorigin></script> -->
-
-console.log(Vue)
-alert('Vスタート')
 
 <script>
 
@@ -1527,6 +1519,7 @@ const app = createApp({
     addTodo() {
       if (!this.newTodo.trim()) return
       this.todos.push({
+        // crypto.randomUUID() → 重複しないIDを生成する（標準的なブラウザ機能）
         id:        crypto.randomUUID(),
         text:      this.newTodo,
         category:  this.category,
@@ -2276,11 +2269,6 @@ app.component('todo-card', {
 // アプリを「id="app"」の要素に表示する
 app.mount('#app')
 
-</script>
-
- <script>
-  console.log(Vue);
-  alert('Vスタート');
 </script>
 <script src="qororie-plugin.js"></script>
 </body>
