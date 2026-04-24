@@ -1013,6 +1013,13 @@
   </div><!-- /#app -->
 
 <!-- Vueを読み込む（バージョンを固定して急に動かなくなるのを防ぐ） -->
+<script>
+  // Vueが5秒でマウントしない場合はv-cloakを強制解除して内容を表示する
+  setTimeout(function() {
+    var el = document.getElementById('app')
+    if (el) el.removeAttribute('v-cloak')
+  }, 5000)
+</script>
 <script src="./vue.global.js"></script>
 
 <script>

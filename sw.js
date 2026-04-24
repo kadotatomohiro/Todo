@@ -3,7 +3,7 @@
 // キャッシュの名前（バージョンを変えると古いキャッシュが消える）
 // ファイルを更新したときは todo-cache-v1をv2, v3 と数字を上げて書き換える
 // =============================================
-const CACHE_NAME = 'todo-cache-v4'
+const CACHE_NAME = 'todo-cache-v5'
 
 // キャッシュするファイルの一覧
 const FILES_TO_CACHE = [
@@ -49,6 +49,10 @@ self.addEventListener('activate', event => {
 
 // ── フェッチ時（ページがファイルを要求するたびに実行） ──
 self.addEventListener('fetch', event => {
+  // 外部ドメイン（Google Fonts など）はService Worker を経由させない
+  const url = new URL(event.request.url)
+  if (url.origin !== self.location.origin) return
+
   event.respondWith(
     fetch(event.request)
       .then(response => {
