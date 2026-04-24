@@ -188,8 +188,9 @@
       /* io-btnと同じ見た目になるよう別途クラスを付けている */
     }
 
-    /* スマホ（400px以下）のときだけボタンを小さくする */
-    @media (max-width: 400px) {
+    /* スマホ（430px以下）のときだけボタンを小さくする */
+    /* 430px = iPhone 14 Pro Max の画面幅。これ以下をスマホと判断する */
+    @media (max-width: 430px) {
       .lang-switch button,
       .io-btn,
       .io-import-label {
@@ -418,13 +419,31 @@
        ToDoカード
     ============================================= */
 
+    /* =============================================
+       【変更履歴】
+       26/04/24 コンパクトカードデザインを適用
+       ─────────────────────────────────────────
+       変更理由：
+         iPhone 13 miniなど小さい画面で、タグが
+         2行になってカードが大きくなりすぎる問題を修正。
+         タスクを一覧で俯瞰しやすくするため、
+         カードの高さをできるだけ小さく整えた。
+
+       変更点まとめ：
+         ・カードの余白を縮小（padding: 12px→7px）
+         ・テキストとタグを1行に並べた（折り返しなし）
+         ・長いテキストは「...」で省略するようにした
+         ・タグが画面端で折り返さないようにした
+         ・文字・タグのサイズをわずかに小さくした
+    ============================================= */
+
     /* 通常のカード */
     .todo-card {
       background: var(--g);
       border: 1px solid var(--e);
       border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 8px;
+      padding: 7px 10px;  /* 26/04/24変更：12px 14px → 7px 10px（上下余白を減らした） */
+      margin-bottom: 5px; /* 26/04/24変更：8px → 5px（カード間の隙間も少し詰めた） */
       cursor: pointer;  /* カードをタップで編集モードに入る */
     }
     /* 期限切れのカード（overdueクラスが付く） */
@@ -443,15 +462,15 @@
     /* カード内の横並びレイアウト */
     .card-row {
       display: flex;
-      align-items: flex-start;  /* 上揃え */
-      gap: 8px;
+      align-items: center;  /* 26/04/24変更：flex-start → center（チェックボックスとテキストを縦中央に揃えた） */
+      gap: 6px;
     }
 
     /* カード左側（チェックボックス＋テキスト） */
     .card-left {
       display: flex;
-      align-items: flex-start;
-      gap: 8px;
+      align-items: center;  /* 26/04/24変更：flex-start → center（上揃えをやめて縦中央に揃えた） */
+      gap: 6px;
       flex: 1;      /* 残りの幅を全部使う */
       min-width: 0; /* テキストが長くてもはみ出さないようにする */
     }
@@ -479,22 +498,26 @@
     /* カード右側のアイコンサイズ */
     .card-right .material-symbols-outlined { font-size: 14px; }
 
-    /* タスクのテキスト＋タグエリア（横並び・折り返しあり） */
+    /* タスクのテキスト＋タグエリア */
     .todo-text-area {
       flex: 1;
       min-width: 0;
       display: flex;
-      flex-wrap: wrap;   /* 幅が足りないとき折り返す */
+      flex-wrap: wrap;     /* 26/04/24変更：タグが入りきらないとき2行目に折り返す */
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     /* タスクのメインテキスト */
     .todo-main-text {
-      font-size: 15px;
+      font-size: 13px;           /* 26/04/24変更：15px → 13px（小画面でも収まるサイズに） */
       color: var(--f);
-      word-break: break-word;  /* 長い単語も折り返す */
+      white-space: nowrap;       /* 26/04/24変更：追加（テキストを1行に強制） */
+      overflow: hidden;          /* 26/04/24変更：追加（はみ出した文字を見えなくする） */
+      text-overflow: ellipsis;   /* 26/04/24変更：追加（はみ出したら末尾を「...」にする） */
       line-height: 1.4;
+      flex-shrink: 1;            /* タグに場所を譲るために縮む */
+      min-width: 8em;            /* 26/04/24変更：0 → 8em（最低8文字分のスペースは必ず確保） */
     }
     /* 完了したタスクは打ち消し線＋緑文字 */
     .todo-main-text.done {
@@ -510,17 +533,18 @@
     .todo-tags {
       font-size: 12px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-left: 6px;
+      flex-wrap: wrap;    /* 26/04/24変更：タグが入りきらないとき折り返す */
+      gap: 3px;
+      flex-shrink: 0;     /* 26/04/24変更：追加（タグは縮まないようにする） */
     }
 
     /* タグの共通スタイル */
     .tag {
       display: inline-block;
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 10px;
+      font-size: 10px;     /* 26/04/24変更：11px → 10px（タグを小さくコンパクトに） */
+      padding: 1px 6px;    /* 26/04/24変更：2px 8px → 1px 6px（タグの余白を縮小） */
+      border-radius: 8px;  /* 26/04/24変更：10px → 8px（タグの角丸を少し調整） */
+      white-space: nowrap; /* 26/04/24変更：追加（タグ内の文字が折り返さないようにした） */
     }
     .tag-category { background: var(--e); color: var(--g); }  /* カテゴリタグ（緑） */
     .tag-date     { background: var(--d); color: var(--g); }  /* 期日タグ（青緑） */
@@ -679,8 +703,9 @@
       border-color: var(--a);
     }
 
-    /* スマホ（450px以下）のとき */
-    @media (max-width: 450px) {
+    /* スマホ（430px以下）のとき */
+    /* 上の @media と基準を統一している */
+    @media (max-width: 430px) {
       .bottom-bar button {
         font-size: 10px;
         padding: 6px 8px;
@@ -1013,13 +1038,6 @@
   </div><!-- /#app -->
 
 <!-- Vueを読み込む（バージョンを固定して急に動かなくなるのを防ぐ） -->
-<script>
-  // Vueが5秒でマウントしない場合はv-cloakを強制解除して内容を表示する
-  setTimeout(function() {
-    var el = document.getElementById('app')
-    if (el) el.removeAttribute('v-cloak')
-  }, 5000)
-</script>
 <script src="./vue.global.js"></script>
 
 <script>
