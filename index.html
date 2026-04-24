@@ -3,8 +3,7 @@
 <head>
 
   <!-- =============================================
-    文字コードの設定（必ず一番最初に書く）
-    UTF-8 → 日本語などの文字が正しく表示される
+    文字コードの設定
   ============================================= -->
   <meta charset="UTF-8">
 
@@ -43,7 +42,7 @@
 
   <title>QsToDo</title>
 
-  <!-- ファビコン（ブラウザのタブに表示される小さいアイコン） -->
+  <!-- ファビコン -->
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
 
   <!-- =============================================
@@ -65,14 +64,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <!-- ホーム画面のアイコン下に表示される名前 -->
   <meta name="apple-mobile-web-app-title" content="ToDo">
-  <!-- iOSのホーム画面アイコン（PNG形式が確実） -->
+  <!-- iOSのホーム画面アイコン -->
   <link rel="apple-touch-icon" href="./icon.png">
 
   <!-- =============================================
     Material Symbols フォントの読み込み
-    Googleが提供するアイコンフォント
-    <span class="material-symbols-outlined">edit</span>
-    のように書くとアイコンが表示される
   ============================================= -->
   <link
     rel="stylesheet"
@@ -83,7 +79,6 @@
 
     /* =============================================
        Material Symbolsアイコンの基本スタイル
-       アイコンフォントの見た目を細かく調整する
     ============================================= */
     .material-symbols-outlined {
       font-size: 20px;         /* アイコンのサイズ */
@@ -100,9 +95,6 @@
 
     /* =============================================
        配色の定義（CSS変数）
-       --a〜--g の変数名に色を入れておく
-       あとで var(--a) のように使える
-       ここを変えるだけでアプリ全体の色が変わる！
     ============================================= */
     :root {
       --a: #F23A30;  /* 赤（削除・期限切れ・アクセント） */
@@ -131,7 +123,7 @@
        CSSでは設定しない（0にしておく）
     ============================================= */
     .container {
-      max-width: 1000px;       /* 最大幅（これ以上広がらない） */
+      max-width: 1000px;       /* 最大幅*/
       margin: 0 auto;          /* 左右中央寄せ */
       padding: 0 16px 90px;   /* 上0・左右16px・下90px（フッター分） */
       font-family: sans-serif; /* ゴシック体フォント */
@@ -746,6 +738,9 @@
       .rotate-message .rotate-icon { font-size: 48px; }
     }
 
+    /* Vue マウント前に {{ }} が見えないようにする */
+    [v-cloak] { display: none; }
+
   </style>
 </head>
 <body>
@@ -769,7 +764,7 @@
             ├── .toast（トースト通知）
             └── .bottom-bar（下部固定エリア）
   ══════════════════════════════════════ -->
-  <div id="app">
+  <div id="app" v-cloak>
 
     <!-- padding-top をVueで動的に変える -->
     <!-- topHeight（ヘッダーの実際の高さ）+ 余白12px -->
@@ -2152,6 +2147,7 @@ app.component('todo-card', {
 app.mount('#app')
 
 </script>
+
 <script src="qororie-plugin.js"></script>
 
 </body>
